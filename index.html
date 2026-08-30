@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Adam M.H. Akati — Books</title>
+<style>
+/* ===== ROOT & RESET ===== */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gr:#16613a;--grd:#0f4528;--grl:#e8f5ee;
+  --go:#b8760f;--gol:#fef5e4;--god:#8a5a0a;
+  --rd:#a32d2d;--rdl:#fdf0f0;
+  --bl:#1a5fa8;--bll:#e8f1fb;
+  --pu:#5b21b6;--pul:#f0ebfe;
+  --bg:#f2f4f7;--wh:#fff;
+  --paper:#faf6ee;
+  --bd:1.5px solid #dde2eb;
+  --tx:#1a1e28;--mu:#6b7280;--lt:#a0aab4;
+  --r:8px;--rl:13px;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 2px 12px rgba(0,0,0,.04);
+  --shl:0 4px 24px rgba(0,0,0,.13);
+  --serif:Georgia,'Iowan Old Style','Palatino Linotype',Palatino,serif;
+}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5;min-height:100vh}
+button{font-family:inherit;cursor:pointer;border:none}
+input,select,textarea{font-family:inherit;font-size:13px;width:100%;padding:8px 11px;border:var(--bd);border-radius:var(--r);background:var(--wh);color:var(--tx);transition:border-color .15s,box-shadow .15s;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--gr);box-shadow:0 0 0 3px rgba(22,97,58,.1)}
+textarea{resize:vertical;min-height:60px}
+label{font-size:11px;font-weight:600;color:var(--mu);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.fg{margin-bottom:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+a{color:var(--gr)}
+
+/* ===== BUTTONS ===== */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 15px;border-radius:var(--r);font-size:12px;font-weight:500;white-space:nowrap;border:var(--bd);background:var(--wh);color:var(--tx);transition:.15s}
+.btn:hover{background:#f0f2f5}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.bg{background:var(--gr);color:#fff;border-color:var(--gr)}.bg:hover{background:var(--grd)}
+.bd{background:var(--rd);color:#fff;border-color:var(--rd)}.bd:hover{opacity:.88}
+.bo{background:var(--go);color:#fff;border-color:var(--go)}.bo:hover{background:var(--god)}
+.bb{background:var(--bl);color:#fff;border-color:var(--bl)}.bb:hover{opacity:.88}
+.bp{background:var(--pu);color:#fff;border-color:var(--pu)}.bp:hover{opacity:.88}
+.sm{padding:4px 10px;font-size:11px;border-radius:6px}
+.xs{padding:3px 7px;font-size:10px;border-radius:5px}
+.bfull{width:100%;justify-content:center}
+
+/* ===== BADGES ===== */
+.bdg{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.bgg{background:var(--grl);color:var(--gr)}.bgr{background:var(--rdl);color:var(--rd)}
+.bgo{background:var(--gol);color:var(--go)}.bgb{background:var(--bll);color:var(--bl)}
+.bgp{background:var(--pul);color:var(--pu)}.bgy{background:#f0f2f5;color:var(--mu)}
+
+/* ===== ADMIN LAYOUT ===== */
+#APP{display:flex;min-height:100vh}
+.sb{width:215px;background:var(--gr);flex-shrink:0;display:flex;flex-direction:column;min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sb-top{padding:18px 14px 14px;border-bottom:1px solid rgba(255,255,255,.12)}
+.sb-lg{width:40px;height:40px;background:var(--go);border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;margin-bottom:9px;overflow:hidden;flex-shrink:0}
+.sb-lg img{width:100%;height:100%;object-fit:cover;border-radius:11px}
+.sb-nm{font-size:12px;font-weight:700;color:#fff;line-height:1.3}
+.sb-rl{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px;text-transform:uppercase;letter-spacing:.6px}
+.sb-nav{flex:1;padding:8px 0}
+.nsec{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);padding:10px 14px 3px;text-transform:uppercase;letter-spacing:1px}
+.ni{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:12px;font-weight:500;color:rgba(255,255,255,.75);cursor:pointer;transition:.15s;border-left:3px solid transparent}
+.ni:hover{background:rgba(255,255,255,.08);color:#fff}
+.ni.active{background:rgba(255,255,255,.15);color:#fff;border-left-color:var(--go)}
+.ni-i{width:17px;text-align:center;flex-shrink:0;font-size:13px}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:100vh}
+.topbar{background:var(--wh);border-bottom:var(--bd);padding:0 22px;height:54px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;position:sticky;top:0;z-index:50;box-shadow:var(--sh)}
+.pg-t{font-size:15px;font-weight:700}
+.top-r{display:flex;align-items:center;gap:8px}
+.uc{display:flex;align-items:center;gap:7px;background:var(--bg);border:var(--bd);border-radius:var(--r);padding:4px 11px 4px 5px;font-size:12px}
+.uav{width:26px;height:26px;border-radius:7px;background:var(--gr);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.lob{background:var(--rdl);color:var(--rd);border:1px solid #f5b8b8;border-radius:var(--r);padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer}
+.lob:hover{background:var(--rd);color:#fff}
+.cnt{flex:1;padding:22px;overflow-y:auto}
+
+/* ===== CARDS ===== */
+.card{background:var(--wh);border:var(--bd);border-radius:var(--rl);padding:18px;box-shadow:var(--sh)}
+.cmb{margin-bottom:16px}
+.ct{font-size:14px;font-weight:700;margin-bottom:3px}
+.cs{font-size:11px;color:var(--mu);margin-bottom:14px}
+
+/* ===== STATS ===== */
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.st{background:var(--wh);border:var(--bd);border-radius:var(--rl);padding:15px 17px;box-shadow:var(--sh)}
+.sn{font-size:24px;font-weight:700;line-height:1}
+.sl{font-size:10px;color:var(--mu);font-weight:600;margin-top:5px;text-transform:uppercase;letter-spacing:.4px}
+
+/* ===== TABLE ===== */
+.tw{overflow-x:auto;border-radius:var(--rl)}
+table{width:100%;border-collapse:collapse}
+th{background:var(--bg);font-weight:600;font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;padding:9px 12px;text-align:left;border-bottom:var(--bd);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1.5px solid #eef0f3;font-size:12px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--bg)}
+
+/* ===== TABS ===== */
+.tb-bar{display:flex;gap:2px;border-bottom:var(--bd);margin-bottom:16px;overflow-x:auto}
+.tab{padding:8px 16px;border:none;background:none;font-size:12px;font-weight:500;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.tab:hover{color:var(--tx)}
+.tab.a{color:var(--gr);border-bottom-color:var(--gr);font-weight:600}
+
+/* ===== MODAL ===== */
+.mobg{position:fixed;inset:0;background:rgba(0,10,20,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)}
+.mbox{background:var(--wh);border:var(--bd);border-radius:var(--rl);padding:22px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:var(--shl)}
+.mbox.lg{max-width:820px}
+.mhd{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.mtl{font-size:15px;font-weight:700}
+.mcl{background:var(--bg);border:var(--bd);border-radius:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--mu);cursor:pointer}
+.mcl:hover{background:#e5e8ec}
+
+/* ===== TOAST ===== */
+#toasts{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.toast{background:var(--wh);border:var(--bd);border-radius:var(--r);padding:10px 16px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;min-width:220px;max-width:320px;box-shadow:var(--shl);pointer-events:auto;animation:ti .25s ease}
+.tok{border-left:4px solid var(--gr);color:var(--gr)}
+.ter{border-left:4px solid var(--rd);color:var(--rd)}
+.tinf{border-left:4px solid var(--bl);color:var(--bl)}
+@keyframes ti{from{transform:translateX(80px);opacity:0}to{transform:none;opacity:1}}
+@keyframes to2{to{transform:translateX(80px);opacity:0}}
+
+/* ===== LOADING SPLASH ===== */
+#LOAD{position:fixed;inset:0;background:linear-gradient(145deg,#0c3d22,#16613a,#1c7545);z-index:9999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:20px}
+.spin{width:64px;height:64px;border:5px solid rgba(255,255,255,.15);border-top-color:#fff;border-right-color:rgba(255,255,255,.5);border-radius:50%;animation:sp .8s cubic-bezier(.4,0,.2,1) infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.spin-inner{position:absolute;width:36px;height:36px;background:rgba(255,255,255,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.12);opacity:1}}
+.ltx{font-size:13px;font-weight:500;color:rgba(255,255,255,.8);letter-spacing:.3px}
+.ltx-school{font-family:var(--serif);font-size:19px;font-weight:700;color:#fff;letter-spacing:.5px;margin-top:4px;text-align:center;padding:0 20px}
+
+/* ===== SETUP/LOGIN ===== */
+.auth-wrap{min-height:100vh;background:linear-gradient(145deg,#0c3d22,#16613a,#1c7545);display:flex;align-items:center;justify-content:center;padding:20px;position:relative}
+.auth-wrap::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 80%,rgba(184,118,15,.15),transparent 60%)}
+.auth-box{background:var(--wh);border-radius:18px;padding:36px;width:100%;max-width:400px;border:var(--bd);box-shadow:0 24px 80px rgba(0,0,0,.3);position:relative;z-index:1}
+.alogo{width:70px;height:70px;background:linear-gradient(135deg,var(--gr),#1d7a45);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 13px;font-size:30px;overflow:hidden;box-shadow:0 8px 24px rgba(22,97,58,.3)}
+.alogo img{width:100%;height:100%;object-fit:cover;border-radius:20px}
+.asch{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--gr);text-align:center;line-height:1.3}
+.atag{font-size:11px;color:var(--mu);text-align:center;margin-top:3px;margin-bottom:24px}
+.sh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:10px}
+.stl{font-size:20px;font-weight:700;margin-bottom:2px}
+.ssb{font-size:12px;color:var(--mu)}
+
+/* ═════════ STOREFRONT ═════════ */
+#PUB{min-height:100vh;display:none;flex-direction:column;background:var(--paper)}
+.pub-nav{background:var(--gr);color:#fff;position:sticky;top:0;z-index:60;box-shadow:0 2px 14px rgba(0,0,0,.12)}
+.pub-nav-in{max-width:1180px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:18px}
+.pub-brand{display:flex;align-items:center;gap:10px;cursor:pointer;flex-shrink:0}
+.pub-brand-lg{width:38px;height:38px;border-radius:9px;background:var(--go);display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;flex-shrink:0}
+.pub-brand-lg img{width:100%;height:100%;object-fit:cover}
+.pub-brand-nm{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.15}
+.pub-brand-tag{font-size:9.5px;color:rgba(255,255,255,.65);letter-spacing:.3px}
+.pub-search{flex:1;max-width:420px}
+.pub-search input{border:none;padding:8px 13px;font-size:12px}
+.pub-nav-r{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
+.pnb{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:7px 12px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.pnb:hover{background:rgba(255,255,255,.22)}
+.cart-badge{background:var(--go);color:#fff;border-radius:20px;font-size:10px;font-weight:700;padding:1px 6px;min-width:16px;text-align:center}
+.pub-admin-link{font-size:10px;color:rgba(255,255,255,.4);text-decoration:underline;cursor:pointer;white-space:nowrap}
+.pub-main{flex:1;max-width:1180px;margin:0 auto;padding:26px 22px;width:100%}
+.pub-footer{background:#0f4528;color:rgba(255,255,255,.75);padding:26px 22px;font-size:11.5px;text-align:center;margin-top:40px}
+.pub-footer a{color:#fff}
+
+/* Hero */
+.hero{background:linear-gradient(120deg,var(--gr),#1d7a45 65%,var(--go));border-radius:18px;padding:34px 30px;color:#fff;margin-bottom:26px;position:relative;overflow:hidden}
+.hero::after{content:'📚';position:absolute;right:20px;bottom:-16px;font-size:110px;opacity:.14}
+.hero-eyebrow{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,.75);font-weight:600}
+.hero-title{font-family:var(--serif);font-size:30px;font-weight:700;margin:6px 0 8px;max-width:560px;line-height:1.2}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.85);max-width:520px}
+
+/* Category pills */
+.cat-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.cat-pill{background:var(--wh);border:1.5px solid #e2ddd0;border-radius:20px;padding:6px 14px;font-size:11.5px;font-weight:600;color:var(--tx);cursor:pointer}
+.cat-pill:hover{border-color:var(--gr)}
+.cat-pill.a{background:var(--gr);border-color:var(--gr);color:#fff}
+
+/* Book grid */
+.book-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:18px}
+.book-card{background:var(--wh);border:1.5px solid #e9e4d8;border-radius:12px;overflow:hidden;cursor:pointer;transition:.15s;display:flex;flex-direction:column}
+.book-card:hover{transform:translateY(-3px);box-shadow:var(--shl);border-color:var(--gr)}
+.book-cov{aspect-ratio:3/4;background:linear-gradient(145deg,#e8f5ee,#dcefe4);display:flex;align-items:center;justify-content:center;font-size:34px;position:relative;overflow:hidden;border-bottom:3px solid var(--go)}
+.book-cov img{width:100%;height:100%;object-fit:cover}
+.book-info{padding:11px 12px 13px;flex:1;display:flex;flex-direction:column}
+.book-title{font-family:var(--serif);font-size:13px;font-weight:700;line-height:1.3;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.book-author{font-size:10.5px;color:var(--mu);margin-bottom:8px}
+.book-price-row{margin-top:auto;display:flex;align-items:center;justify-content:space-between}
+.book-price{font-weight:700;color:var(--gr);font-size:13px}
+.badge-cat{position:absolute;top:8px;left:8px;background:rgba(255,255,255,.92);color:var(--god);font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px}
+
+/* Book detail */
+.detail-wrap{display:grid;grid-template-columns:260px 1fr;gap:28px}
+@media(max-width:640px){.detail-wrap{grid-template-columns:1fr}}
+.detail-cov{aspect-ratio:3/4;border-radius:14px;background:linear-gradient(145deg,#e8f5ee,#dcefe4);display:flex;align-items:center;justify-content:center;font-size:52px;overflow:hidden;box-shadow:var(--shl);border-bottom:5px solid var(--go)}
+.detail-cov img{width:100%;height:100%;object-fit:cover}
+.detail-title{font-family:var(--serif);font-size:25px;font-weight:700;line-height:1.25;margin-bottom:5px}
+.detail-author{color:var(--mu);font-size:13px;margin-bottom:14px}
+.detail-price{font-size:22px;font-weight:700;color:var(--gr);margin-bottom:16px}
+.qty-step{display:inline-flex;align-items:center;border:var(--bd);border-radius:var(--r);overflow:hidden}
+.qty-step button{width:30px;height:32px;background:var(--bg);font-size:15px;font-weight:600}
+.qty-step span{width:34px;text-align:center;font-weight:600;font-size:13px}
+
+/* Cart */
+.cart-line{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1.5px solid #eee}
+.cart-line:last-child{border-bottom:none}
+.cart-thumb{width:48px;height:64px;border-radius:6px;background:linear-gradient(145deg,#e8f5ee,#dcefe4);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden}
+.cart-thumb img{width:100%;height:100%;object-fit:cover}
+.cart-empty{text-align:center;padding:50px 20px;color:var(--mu)}
+.cart-empty .ic{font-size:44px;margin-bottom:10px}
+
+/* Checkout mode toggle */
+.mode-toggle{display:flex;gap:0;border-radius:9px;overflow:hidden;border:1.5px solid #e2ddd0;margin-bottom:18px}
+.mode-toggle button{flex:1;padding:10px;font-size:12px;font-weight:600;background:#f5f7fa;color:#666}
+.mode-toggle button.a{background:var(--gr);color:#fff}
+
+/* Order summary sidebar */
+.osum{background:var(--wh);border:1.5px solid #e9e4d8;border-radius:12px;padding:16px}
+.osum-line{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;color:var(--mu)}
+.osum-total{display:flex;justify-content:space-between;font-size:15px;font-weight:700;padding-top:8px;margin-top:8px;border-top:1.5px solid #eee}
+
+/* Empty state */
+.empty-state{text-align:center;padding:60px 20px;color:var(--mu)}
+.empty-state .ic{font-size:46px;margin-bottom:12px}
+
+/* Confirmation */
+.confirm-wrap{max-width:520px;margin:0 auto;text-align:center;padding:30px 20px}
+.confirm-check{width:64px;height:64px;border-radius:50%;background:var(--grl);color:var(--gr);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 16px}
+.order-no{font-family:monospace;background:var(--bg);padding:6px 14px;border-radius:8px;font-weight:700;display:inline-block;margin:10px 0}
+
+/* Book upload rows in admin */
+.file-drop{border:1.75px dashed #cfd6df;border-radius:10px;padding:16px;text-align:center;font-size:11.5px;color:var(--mu);cursor:pointer}
+.file-drop:hover{border-color:var(--gr);color:var(--gr)}
+
+/* ===== PRINT (order receipt) ===== */
+@media print{
+  html,body{margin:0!important;padding:0!important;background:#fff!important}
+  body>*{display:none!important}
+  #PA{display:block!important;position:static!important}
+  @page{margin:10mm;size:A4 portrait}
+}
+#PA{display:none;font-family:'Segoe UI',Arial,sans-serif}
+.rcp{font-family:'Segoe UI',Arial,sans-serif;background:#fff;border:1px solid #bbb;max-width:480px}
+.rch{display:flex;align-items:center;gap:14px;padding:13px 15px 10px;border-bottom:3px solid #16613a}
+.rcr{width:56px;height:56px;flex-shrink:0;border-radius:10px;border:2px solid #b8760f;background:#16613a;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;overflow:hidden}
+.rcr img{width:100%;height:100%;object-fit:cover}
+.rcsn{font-size:16px;font-weight:700;color:#16613a}
+.rcci{font-size:10px;color:#666;margin-top:2px}
+.rcdt{background:#16613a;color:#fff;text-align:center;padding:6px;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+.rcbd{padding:12px 15px}
+.rct{width:100%;border-collapse:collapse;margin:8px 0;font-size:11px}
+.rct th{background:#16613a;color:#fff;padding:6px 8px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.4px}
+.rct td{padding:5px 7px;border-bottom:1px solid #eee}
+.rcft{background:#16613a;color:#fff;text-align:center;padding:6px;font-size:9px;letter-spacing:.3px}
+</style>
+</head>
+<body>
+
+<div id="toasts"></div>
+<div id="PA"></div>
+<div id="LOAD">
+  <div style="position:relative;display:flex;align-items:center;justify-content:center;width:64px;height:64px">
+    <div class="spin"></div>
+    <div class="spin-inner">📖</div>
+  </div>
+  <div class="ltx-school" id="LSCHOOL">ADAM M.H. AKATI — BOOKS</div>
+  <div class="ltx" id="LTXT">Loading...</div>
+</div>
+
+<!-- ══════ SETUP (admin, one-time) ══════ -->
+<div id="PG-setup" class="auth-wrap" style="display:none">
+  <div class="auth-box" style="max-width:460px">
+    <div style="font-size:36px;text-align:center;margin-bottom:10px">🗄️</div>
+    <div style="font-size:18px;font-weight:700;color:var(--gr);text-align:center;margin-bottom:6px">Store Database Setup</div>
+    <div style="background:#f0f7ff;border-radius:8px;padding:13px;margin-bottom:16px;font-size:12px;line-height:1.85;color:#333">
+      <b>One-time setup (2 min):</b><br>
+      1. Go to <a href="https://jsonbin.io" target="_blank" style="color:var(--bl);font-weight:600">jsonbin.io</a> → sign in → <b>API Keys</b><br>
+      2. Copy your <b>Master Key</b> (starts with <code>$2a$</code>/<code>$2b$</code>) and paste below<br>
+      3. Click <b>Set Up Store</b> — this device creates the database and a restricted public key, then lets you download the file to host publicly<br>
+      4. Your Master Key is <b>never saved or embedded</b> anywhere — only used once, right now, in this browser
+    </div>
+    <div class="fg">
+      <label>Master API Key (used once, not stored)</label>
+      <input id="SU-key" placeholder="$2a$10$... (paste full key)" style="font-family:monospace;font-size:11px">
+    </div>
+    <div id="SU-alert"></div>
+    <button class="btn bg bfull" style="padding:11px;font-size:13px;border-radius:10px" onclick="doSetup()">🚀 Set Up Store</button>
+    <p style="text-align:center;font-size:10px;color:var(--mu);margin-top:14px">Already set up on another device? <span style="color:var(--gr);font-weight:600;cursor:pointer;text-decoration:underline" onclick="showReconnect()">Connect with access code</span></p>
+    <div id="SU-reconnect" style="display:none;margin-top:12px;padding-top:14px;border-top:1.5px solid #eee">
+      <div class="fg"><label>Store Access Code</label><input id="SU-code" placeholder="Paste access code..."></div>
+      <div id="SU-alert2"></div>
+      <button class="btn bfull" onclick="doStaffConnect()">Connect</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ PUBLIC STOREFRONT ══════ -->
+<div id="PUB">
+  <div class="pub-nav">
+    <div class="pub-nav-in">
+      <div class="pub-brand" onclick="pubGo('home')">
+        <div class="pub-brand-lg" id="P-logo">📚</div>
+        <div>
+          <div class="pub-brand-nm" id="P-name">Adam M.H. Akati</div>
+          <div class="pub-brand-tag" id="P-tag">eBooks &amp; Reading</div>
+        </div>
+      </div>
+      <div class="pub-search">
+        <input id="P-search" placeholder="Search books, authors, categories..." oninput="pubSearchInput()" onkeydown="if(event.key==='Enter')pubGo('catalog')">
+      </div>
+      <div class="pub-nav-r">
+        <button class="pnb" onclick="pubGo('cart')">🛒 Cart <span class="cart-badge" id="P-cart-count">0</span></button>
+        <button class="pnb" id="P-account-btn" onclick="pubAccountClick()">👤 Account</button>
+      </div>
+    </div>
+  </div>
+  <div class="pub-main" id="PUB-CNT"></div>
+  <div class="pub-footer">
+    <div id="P-foot-name" style="font-weight:700;color:#fff;margin-bottom:4px">Adam M.H. Akati</div>
+    <div id="P-foot-contact"></div>
+    <div style="margin-top:10px">© <span id="P-year"></span> · <span class="pub-admin-link" onclick="pubShowAdminLogin()">Admin</span></div>
+  </div>
+</div>
+
+<!-- ══════ ADMIN APP ══════ -->
+<div id="PG-app" style="display:none">
+  <div id="APP">
+    <div class="sb">
+      <div class="sb-top">
+        <div class="sb-lg" id="SB-logo">AA</div>
+        <div class="sb-nm" id="SB-name">Adam M.H. Akati</div>
+        <div class="sb-rl">Store Admin</div>
+      </div>
+      <nav class="sb-nav" id="NAV"></nav>
+    </div>
+    <div class="main">
+      <div class="topbar">
+        <div class="pg-t" id="PG-title">Dashboard</div>
+        <div class="top-r">
+          <button class="btn sm" onclick="pubGo('home');showPUB()">🔗 View Store</button>
+          <div class="uc"><div class="uav" id="U-av">A</div><span id="U-nm">Admin</span></div>
+          <button class="lob" onclick="doLogout()">⬅ Logout</button>
+        </div>
+      </div>
+      <div class="cnt" id="CNT"><div style="display:flex;align-items:center;justify-content:center;height:200px;gap:12px"><div class="spin"></div><span style="color:var(--mu)">Loading...</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ MODAL ══════ -->
+<div id="MO-bg" class="mobg" style="display:none" onclick="moBgClick(event)">
+  <div class="mbox" id="MO-box"></div>
+</div>
+
+<script>
+'use strict';
+/* ============================================================
+   ADAM M.H. AKATI — BOOKS  (eBook store)
+   Backend: JSONBin.io — public/customer file uses a RESTRICTED
+   Access Key only (read+update). The account Master Key is used
+   ONLY once, live, during Admin Setup — it is never written into
+   any file that gets distributed/hosted.
+   ============================================================ */
+
+// ---- EMBEDDED CREDENTIALS (filled in by "Download store file" after setup) ----
+let EMBEDDED_BIN_ID = '';
+let EMBEDDED_ACCESS_KEY = '';
+
+let BIN_ID = EMBEDDED_BIN_ID || localStorage.getItem('bk_bin') || '';
+let ACCESS_KEY = EMBEDDED_ACCESS_KEY || localStorage.getItem('bk_key') || '';
+
+let DB = null;
+let ADMIN = null;      // logged-in admin user object
+let CUST = null;       // logged-in customer object
+let CART = [];         // [{bookId, qty}]
+let SAVING = false;
+
+function money(n){ n=+n||0; return (DB&&DB.store.currency||'GHS')+' '+n.toFixed(2); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function today(){ return new Date().toISOString().slice(0,10); }
+
+/* ================= TOAST ================= */
+function toast(msg,type){
+  type=type||'ok';
+  const cls=type==='ok'?'tok':type==='err'?'ter':'tinf';
+  const ic=type==='ok'?'✓':type==='err'?'✕':'ℹ';
+  const el=document.createElement('div');
+  el.className='toast '+cls;
+  el.innerHTML='<span>'+ic+'</span><span>'+esc(msg)+'</span>';
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(()=>{ el.style.animation='to2 .25s ease forwards'; setTimeout(()=>el.remove(),250); },3200);
+}
+
+/* ================= MODAL ================= */
+function moOpen(html){
+  document.getElementById('MO-box').innerHTML=html;
+  document.getElementById('MO-bg').style.display='flex';
+}
+function moClose(){ document.getElementById('MO-bg').style.display='none'; document.getElementById('MO-box').innerHTML=''; }
+function moBgClick(e){ if(e.target.id==='MO-bg') moClose(); }
+function confirmModal(title,msg,okLabel,okClass,cb){
+  moOpen(`<div class="mhd"><div class="mtl">${esc(title)}</div><div class="mcl" onclick="moClose()">×</div></div>
+    <p style="font-size:12.5px;color:#444;line-height:1.6;margin-bottom:18px">${msg}</p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="moClose()">Cancel</button>
+      <button class="btn ${okClass||'bd'}" id="MO-confirm-btn">${esc(okLabel||'Confirm')}</button>
+    </div>`);
+  document.getElementById('MO-confirm-btn').onclick=function(){ moClose(); cb(); };
+}
+function loading(on,msg){
+  const L=document.getElementById('LOAD');
+  L.style.display = on? 'flex':'none';
+  if(msg) document.getElementById('LTXT').textContent=msg;
+}
+
+/* ================= JSONBIN CORE ================= */
+async function binCreate(masterKey, data){
+  const r = await fetch('https://api.jsonbin.io/v3/b',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','X-Master-Key':masterKey,'X-Bin-Private':'true'},
+    body:JSON.stringify(data)
+  });
+  const j = await r.json();
+  if(!r.ok) throw new Error(j.message||'Failed to create bin');
+  return j.metadata.id;
+}
+async function accessKeyCreate(masterKey, binId){
+  const r = await fetch('https://api.jsonbin.io/v3/a',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','X-Master-Key':masterKey,'X-Key-Name':'BookStore-Public-'+Date.now()},
+    body:JSON.stringify({
+      bins:{ [binId]: { read:true, update:true, delete:false } }
+    })
+  });
+  const j = await r.json();
+  if(!r.ok) throw new Error(j.message||'Failed to create access key');
+  return j.accessKey;
+}
+async function dbRead(){
+  const r = await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID+'/latest',{
+    headers:{'X-Access-Key':ACCESS_KEY}
+  });
+  const j = await r.json();
+  if(!r.ok) throw new Error(j.message||'Read failed');
+  return j.record;
+}
+async function dbWrite(data){
+  SAVING=true;
+  try{
+    const r = await fetch('https://api.jsonbin.io/v3/b/'+BIN_ID,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Access-Key':ACCESS_KEY,'X-Bin-Versioning':'false'},
+      body:JSON.stringify(data)
+    });
+    const j = await r.json();
+    if(!r.ok) throw new Error(j.message||'Save failed');
+    localStorage.setItem('bk_cache', JSON.stringify(data));
+  } finally { SAVING=false; }
+}
+async function saveDB(){
+  try{ await dbWrite(DB); }
+  catch(e){ toast('Save failed: '+e.message,'err'); }
+}
+
+/* ================= EMPTY DB / NORMALISE ================= */
+function EMPTY_DB(){
+  return {
+    store:{ name:'Adam M.H. Akati', tagline:'eBooks & Reading', email:'', phone:'', momoNumber:'', momoName:'',
+            address:'', logo:'', currency:'GHS', about:'' },
+    users:[ { id:1, username:'admin', password:'admin123', name:'Adam M.H. Akati', role:'admin' } ],
+    customers:[],
+    books:[
+      { id:1, title:'Sample Title — Edit Me', author:'Adam M.H. Akati', category:'Fiction', price:15,
+        description:'Add a real description of this book in the admin panel.', cover:'', ebookLink:'',
+        ebookFileName:'', ebookFileData:'', ebookFileSize:0, status:'active', featured:true, createdAt:today() }
+    ],
+    orders:[],
+    nextBid:2, nextOid:1, nextCid:1, nextUid:2
+  };
+}
+function normaliseDB(d){
+  d=d||{};
+  const e=EMPTY_DB();
+  d.store=Object.assign(e.store,d.store||{});
+  d.users=Array.isArray(d.users)&&d.users.length?d.users:e.users;
+  d.customers=Array.isArray(d.customers)?d.customers:[];
+  d.books=Array.isArray(d.books)?d.books:e.books;
+  d.orders=Array.isArray(d.orders)?d.orders:[];
+  d.nextBid=d.nextBid||((d.books.reduce((m,b)=>Math.max(m,b.id||0),0))+1);
+  d.nextOid=d.nextOid||1;
+  d.nextCid=d.nextCid||((d.customers.reduce((m,c)=>Math.max(m,c.id||0),0))+1);
+  d.nextUid=d.nextUid||((d.users.reduce((m,u)=>Math.max(m,u.id||0),0))+1);
+  return d;
+}
+
+/* ================= BOOT ================= */
+window.addEventListener('DOMContentLoaded', boot);
+async function boot(){
+  document.getElementById('LSCHOOL').textContent='ADAM M.H. AKATI — BOOKS';
+  if(!BIN_ID || !ACCESS_KEY){
+    document.getElementById('PG-setup').style.display='flex';
+    return;
+  }
+  loading(true,'Opening the store...');
+  try{
+    DB = normaliseDB(await dbRead());
+    localStorage.setItem('bk_bin',BIN_ID);
+    localStorage.setItem('bk_key',ACCESS_KEY);
+  }catch(e){
+    // fall back to cache so the storefront still works offline / on hiccup
+    const cache=localStorage.getItem('bk_cache');
+    if(cache){ DB=normaliseDB(JSON.parse(cache)); toast('Showing cached catalog — reconnect to refresh','info'); }
+    else { loading(false); document.getElementById('PG-setup').style.display='flex'; toast('Could not reach the store database: '+e.message,'err'); return; }
+  }
+  loading(false);
+  restoreCart();
+  const cid = sessionStorage.getItem('bk_cust');
+  if(cid) CUST = DB.customers.find(c=>c.id==cid) || null;
+  const uidd = sessionStorage.getItem('bk_admin');
+  if(uidd) ADMIN = DB.users.find(u=>u.id==uidd) || null;
+  applyBranding();
+  showPUB();
+  pubGo('home');
+}
+function applyBranding(){
+  const s=DB.store;
+  document.title=s.name+' — Books';
+  document.getElementById('P-name').textContent=s.name;
+  document.getElementById('P-tag').textContent=s.tagline||'eBooks & Reading';
+  document.getElementById('P-foot-name').textContent=s.name;
+  document.getElementById('P-foot-contact').textContent=[s.email,s.phone,s.address].filter(Boolean).join(' · ');
+  document.getElementById('P-year').textContent=new Date().getFullYear();
+  document.getElementById('SB-name').textContent=s.name;
+  if(s.logo){
+    document.getElementById('P-logo').innerHTML='<img src="'+s.logo+'">';
+    document.getElementById('SB-logo').innerHTML='<img src="'+s.logo+'">';
+  }
+}
+function showPUB(){ document.getElementById('PUB').style.display='flex'; document.getElementById('PG-app').style.display='none'; }
+function showADMIN(){ document.getElementById('PUB').style.display='none'; document.getElementById('PG-app').style.display='block'; }
+
+/* ================= SETUP FLOW ================= */
+async function doSetup(){
+  const key=document.getElementById('SU-key').value.trim();
+  const al=document.getElementById('SU-alert');
+  al.innerHTML='';
+  if(!key.startsWith('$2')){ al.innerHTML='<div style="background:#fdf0f0;color:#a32d2d;padding:9px 12px;border-radius:8px;font-size:11.5px;margin-bottom:10px">That doesn\'t look like a JSONBin Master Key — it should start with $2a$ or $2b$.</div>'; return; }
+  loading(true,'Creating your store database...');
+  try{
+    const seed = EMPTY_DB();
+    const newBinId = await binCreate(key, seed);
+    loading(true,'Creating a restricted public key...');
+    const newAccessKey = await accessKeyCreate(key, newBinId);
+    BIN_ID=newBinId; ACCESS_KEY=newAccessKey;
+    localStorage.setItem('bk_bin',BIN_ID); localStorage.setItem('bk_key',ACCESS_KEY);
+    DB = normaliseDB(seed);
+    loading(false);
+    document.getElementById('PG-setup').style.display='none';
+    offerDownload();
+  }catch(e){
+    loading(false);
+    al.innerHTML='<div style="background:#fdf0f0;color:#a32d2d;padding:9px 12px;border-radius:8px;font-size:11.5px;margin-bottom:10px">'+esc(e.message)+'</div>';
+  }
+}
+function offerDownload(){
+  moOpen(`<div class="mhd"><div class="mtl">🎉 Store is ready!</div></div>
+    <p style="font-size:12.5px;color:#444;line-height:1.7;margin-bottom:14px">
+      Your database is live. Download the <b>store file</b> below and upload it to your web host (or wherever you serve the site from) — that file has your public store key baked in, ready for customers to open and shop. Your Master Key was never saved anywhere.
+    </p>
+    <button class="btn bg bfull" style="padding:11px" onclick="downloadConfiguredFile();moClose();applyBranding();showPUB();pubGo('home')">⬇ Download Store File</button>
+    <button class="btn bfull" style="margin-top:8px" onclick="moClose();applyBranding();showPUB();pubGo('home')">Continue here for now</button>`);
+}
+function downloadConfiguredFile(){
+  fetch(window.location.href).then(r=>r.text()).then(html=>{
+    html = html.replace("let EMBEDDED_BIN_ID = '';","let EMBEDDED_BIN_ID = "+JSON.stringify(BIN_ID)+";");
+    html = html.replace("let EMBEDDED_ACCESS_KEY = '';","let EMBEDDED_ACCESS_KEY = "+JSON.stringify(ACCESS_KEY)+";");
+    const blob=new Blob([html],{type:'text/html'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='adam-akati-books-store.html';
+    a.click();
+    toast('Store file downloaded — host this file for customers','ok');
+  }).catch(()=>toast('Could not read this page to package it — copy the file manually and paste in your BIN ID / Access Key','err'));
+}
+function showReconnect(){ document.getElementById('SU-reconnect').style.display='block'; }
+async function doStaffConnect(){
+  const code=document.getElementById('SU-code').value.trim();
+  const al=document.getElementById('SU-alert2'); al.innerHTML='';
+  try{
+    const decoded=JSON.parse(atob(code));
+    if(!decoded.b||!decoded.k) throw new Error('bad code');
+    BIN_ID=decoded.b; ACCESS_KEY=decoded.k;
+    localStorage.setItem('bk_bin',BIN_ID); localStorage.setItem('bk_key',ACCESS_KEY);
+    location.reload();
+  }catch(e){ al.innerHTML='<div style="background:#fdf0f0;color:#a32d2d;padding:9px 12px;border-radius:8px;font-size:11.5px">Invalid access code.</div>'; }
+}
+function getAccessCode(){ return btoa(JSON.stringify({b:BIN_ID,k:ACCESS_KEY})); }
+
+/* ================= CART ================= */
+function restoreCart(){ try{ CART=JSON.parse(localStorage.getItem('bk_cart')||'[]'); }catch(e){ CART=[]; } renderCartBadge(); }
+function persistCart(){ localStorage.setItem('bk_cart',JSON.stringify(CART)); renderCartBadge(); }
+function cartAdd(bookId,qty){
+  qty=qty||1;
+  const line=CART.find(l=>l.bookId===bookId);
+  if(line) line.qty+=qty; else CART.push({bookId,qty});
+  persistCart();
+  toast('Added to cart','ok');
+}
+function cartSetQty(bookId,qty){
+  const line=CART.find(l=>l.bookId===bookId);
+  if(!line) return;
+  line.qty=Math.max(1,qty);
+  persistCart();
+  pubGo('cart');
+}
+function cartRemove(bookId){ CART=CART.filter(l=>l.bookId!==bookId); persistCart(); pubGo('cart'); }
+function cartCount(){ return CART.reduce((s,l)=>s+l.qty,0); }
+function cartLines(){ return CART.map(l=>({...l, book:DB.books.find(b=>b.id===l.bookId)})).filter(l=>l.book); }
+function cartTotal(){ return cartLines().reduce((s,l)=>s+l.book.price*l.qty,0); }
+function renderCartBadge(){ const el=document.getElementById('P-cart-count'); if(el) el.textContent=cartCount(); }
+
+/* ================= PUBLIC STOREFRONT ROUTER ================= */
+let PUB_CAT='All', PUB_SEARCH='';
+function pubSearchInput(){ PUB_SEARCH=document.getElementById('P-search').value; if(PUB_VIEW==='catalog'||PUB_VIEW==='home') renderCatalogBody(); }
+let PUB_VIEW='home';
+function pubGo(view,param){
+  PUB_VIEW=view; window.scrollTo(0,0);
+  const C=document.getElementById('PUB-CNT');
+  if(view==='home') C.innerHTML=pubHomeHTML();
+  else if(view==='catalog') C.innerHTML=pubCatalogHTML();
+  else if(view==='detail') C.innerHTML=pubDetailHTML(param);
+  else if(view==='cart') C.innerHTML=pubCartHTML();
+  else if(view==='checkout') C.innerHTML=pubCheckoutHTML();
+  else if(view==='confirm') C.innerHTML=pubConfirmHTML(param);
+  else if(view==='account') C.innerHTML=pubAccountHTML();
+  else if(view==='orders') C.innerHTML=pubOrdersHTML();
+  else if(view==='lookup') C.innerHTML=pubLookupHTML();
+  updateAccountBtn();
+}
+function updateAccountBtn(){
+  document.getElementById('P-account-btn').innerHTML = CUST ? ('👤 '+esc(CUST.name.split(' ')[0])) : '👤 Account';
+}
+function pubAccountClick(){ if(CUST) pubGo('account'); else pubGo('lookup'); }
+
+function catList(){ const s=new Set(DB.books.filter(b=>b.status!=='hidden').map(b=>b.category||'General')); return ['All',...s]; }
+
+function pubHomeHTML(){
+  const featured=DB.books.filter(b=>b.status!=='hidden'&&b.featured).slice(0,8);
+  const list=featured.length?featured:DB.books.filter(b=>b.status!=='hidden').slice(0,8);
+  return `
+    <div class="hero">
+      <div class="hero-eyebrow">Welcome to</div>
+      <div class="hero-title">${esc(DB.store.name)}</div>
+      <div class="hero-sub">${esc(DB.store.tagline||'Browse our eBooks and get instant access after purchase — no account required.')}</div>
+    </div>
+    ${catRowHTML()}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-family:var(--serif);font-size:18px;font-weight:700">Featured Books</div>
+      <span style="font-size:11.5px;color:var(--gr);font-weight:600;cursor:pointer" onclick="pubGo('catalog')">View all →</span>
+    </div>
+    <div class="book-grid">${list.map(bookCardHTML).join('')||emptyBooksHTML()}</div>`;
+}
+function catRowHTML(){
+  return `<div class="cat-row">${catList().map(c=>`<div class="cat-pill ${c===PUB_CAT?'a':''}" onclick="PUB_CAT='${esc(c)}';pubGo('catalog')">${esc(c)}</div>`).join('')}</div>`;
+}
+function emptyBooksHTML(){ return `<div class="empty-state" style="grid-column:1/-1"><div class="ic">📭</div>No books available yet — check back soon.</div>`; }
+function bookCardHTML(b){
+  return `<div class="book-card" onclick="pubGo('detail',${b.id})">
+    <div class="book-cov">${b.cover?'<img src="'+b.cover+'">':'📘'}<span class="badge-cat">${esc(b.category||'Book')}</span></div>
+    <div class="book-info">
+      <div class="book-title">${esc(b.title)}</div>
+      <div class="book-author">${esc(b.author||'')}</div>
+      <div class="book-price-row"><span class="book-price">${money(b.price)}</span></div>
+    </div></div>`;
+}
+function pubCatalogHTML(){
+  return `<div style="font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:14px">All Books</div>
+    ${catRowHTML()}
+    <div id="CAT-BODY"></div>` + (function(){ setTimeout(renderCatalogBody,0); return ''; })();
+}
+function renderCatalogBody(){
+  const el=document.getElementById('CAT-BODY'); if(!el) return;
+  let list=DB.books.filter(b=>b.status!=='hidden');
+  if(PUB_CAT&&PUB_CAT!=='All') list=list.filter(b=>(b.category||'General')===PUB_CAT);
+  if(PUB_SEARCH.trim()){
+    const q=PUB_SEARCH.toLowerCase();
+    list=list.filter(b=>(b.title+' '+b.author+' '+b.category).toLowerCase().includes(q));
+  }
+  el.innerHTML=`<div class="book-grid">${list.map(bookCardHTML).join('')||emptyBooksHTML()}</div>`;
+}
+function pubDetailHTML(id){
+  const b=DB.books.find(x=>x.id===id);
+  if(!b) return emptyBooksHTML();
+  return `<div class="detail-wrap">
+    <div><div class="detail-cov">${b.cover?'<img src="'+b.cover+'">':'📘'}</div></div>
+    <div>
+      <span class="bdg bgo" style="margin-bottom:8px;display:inline-block">${esc(b.category||'Book')}</span>
+      <div class="detail-title">${esc(b.title)}</div>
+      <div class="detail-author">by ${esc(b.author||'Unknown')}</div>
+      <div class="detail-price">${money(b.price)}</div>
+      <p style="font-size:12.5px;line-height:1.75;color:#444;margin-bottom:18px;white-space:pre-wrap">${esc(b.description||'No description yet.')}</p>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div class="qty-step">
+          <button onclick="dQty(-1)">−</button><span id="D-qty">1</span><button onclick="dQty(1)">+</button>
+        </div>
+        <button class="btn bg" style="padding:10px 22px" onclick="cartAdd(${b.id},window.__dqty||1)">🛒 Add to Cart</button>
+        <button class="btn bo" style="padding:10px 22px" onclick="cartAdd(${b.id},window.__dqty||1);pubGo('checkout')">⚡ Buy Now</button>
+      </div>
+    </div></div>`;
+}
+window.__dqty=1;
+function dQty(d){ window.__dqty=Math.max(1,(window.__dqty||1)+d); document.getElementById('D-qty').textContent=window.__dqty; }
+
+function pubCartHTML(){
+  const lines=cartLines();
+  if(!lines.length) return `<div class="cart-empty"><div class="ic">🛒</div>Your cart is empty.<br><button class="btn bg" style="margin-top:14px" onclick="pubGo('home')">Browse Books</button></div>`;
+  return `<div style="font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:16px">Your Cart</div>
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:24px" class="g2c">
+      <div class="card">
+        ${lines.map(l=>`<div class="cart-line">
+          <div class="cart-thumb">${l.book.cover?'<img src="'+l.book.cover+'">':'📘'}</div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:12.5px">${esc(l.book.title)}</div>
+            <div style="font-size:11px;color:var(--mu)">${money(l.book.price)} each</div>
+          </div>
+          <div class="qty-step" style="transform:scale(.85)">
+            <button onclick="cartSetQty(${l.bookId},${l.qty-1})">−</button><span>${l.qty}</span><button onclick="cartSetQty(${l.bookId},${l.qty+1})">+</button>
+          </div>
+          <div style="font-weight:700;width:70px;text-align:right">${money(l.book.price*l.qty)}</div>
+          <button class="btn xs bd" onclick="cartRemove(${l.bookId})">✕</button>
+        </div>`).join('')}
+      </div>
+      <div class="osum">
+        <div class="osum-line"><span>Items</span><span>${cartCount()}</span></div>
+        <div class="osum-total"><span>Total</span><span>${money(cartTotal())}</span></div>
+        <button class="btn bg bfull" style="margin-top:14px;padding:10px" onclick="pubGo('checkout')">Proceed to Checkout →</button>
+      </div>
+    </div>
+    <style>@media(max-width:640px){.g2c{grid-template-columns:1fr!important}}</style>`;
+}
+
+let CHK_MODE='guest';
+function pubCheckoutHTML(){
+  const lines=cartLines();
+  if(!lines.length) return `<div class="empty-state"><div class="ic">🛒</div>Your cart is empty.</div>`;
+  if(CUST) CHK_MODE='account';
+  return `<div style="font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:16px">Checkout</div>
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:24px" class="g2c">
+      <div class="card">
+        ${CUST? `<div style="background:var(--grl);color:var(--gr);padding:10px 13px;border-radius:8px;font-size:12px;font-weight:600;margin-bottom:16px">✓ Checking out as ${esc(CUST.name)} (${esc(CUST.email)})</div>`
+        : `<div class="mode-toggle">
+            <button class="${CHK_MODE==='guest'?'a':''}" onclick="CHK_MODE='guest';pubGo('checkout')">Guest Checkout</button>
+            <button class="${CHK_MODE==='login'?'a':''}" onclick="CHK_MODE='login';pubGo('checkout')">Login / Register</button>
+          </div>`}
+        ${!CUST && CHK_MODE==='login' ? checkoutLoginHTML() : ''}
+        ${(CUST || CHK_MODE==='guest') ? checkoutFormHTML() : ''}
+      </div>
+      <div class="osum">
+        ${lines.map(l=>`<div class="osum-line"><span>${esc(l.book.title)} × ${l.qty}</span><span>${money(l.book.price*l.qty)}</span></div>`).join('')}
+        <div class="osum-total"><span>Total</span><span>${money(cartTotal())}</span></div>
+      </div>
+    </div>
+    <style>@media(max-width:640px){.g2c{grid-template-columns:1fr!important}}</style>`;
+}
+function checkoutLoginHTML(){
+  return `<div id="CO-login">
+    <div class="tb-bar" style="margin-bottom:14px">
+      <button class="tab a" id="CO-tab-login" onclick="coSwitch('login')">Login</button>
+      <button class="tab" id="CO-tab-reg" onclick="coSwitch('reg')">Register</button>
+    </div>
+    <div id="CO-login-body">
+      <div class="fg"><label>Email</label><input id="CO-email"></div>
+      <div class="fg"><label>Password</label><input id="CO-pass" type="password"></div>
+      <button class="btn bg bfull" onclick="doCustLogin('CO')">Login</button>
+    </div>
+  </div>`;
+}
+function coSwitch(which){
+  document.getElementById('CO-tab-login').className='tab'+(which==='login'?' a':'');
+  document.getElementById('CO-tab-reg').className='tab'+(which==='reg'?' a':'');
+  const body=document.getElementById('CO-login-body');
+  if(which==='login'){
+    body.innerHTML=`<div class="fg"><label>Email</label><input id="CO-email"></div>
+      <div class="fg"><label>Password</label><input id="CO-pass" type="password"></div>
+      <button class="btn bg bfull" onclick="doCustLogin('CO')">Login</button>`;
+  } else {
+    body.innerHTML=`<div class="fg"><label>Full Name</label><input id="CO-rname"></div>
+      <div class="fg"><label>Email</label><input id="CO-remail"></div>
+      <div class="fg"><label>Phone</label><input id="CO-rphone"></div>
+      <div class="fg"><label>Password</label><input id="CO-rpass" type="password"></div>
+      <button class="btn bg bfull" onclick="doCustRegister('CO')">Create Account</button>`;
+  }
+}
+function checkoutFormHTML(){
+  const name=CUST?CUST.name:'', email=CUST?CUST.email:'', phone=CUST?CUST.phone:'';
+  return `<div class="fg"><label>Full Name</label><input id="CK-name" value="${esc(name)}"></div>
+    <div class="g2">
+      <div class="fg"><label>Email (for delivery)</label><input id="CK-email" value="${esc(email)}"></div>
+      <div class="fg"><label>Phone (Mobile Money)</label><input id="CK-phone" value="${esc(phone)}"></div>
+    </div>
+    <div class="fg"><label>Payment Method</label>
+      <select id="CK-pay">
+        <option>Mobile Money</option>
+        <option>Cash (in person)</option>
+      </select>
+    </div>
+    ${DB.store.momoNumber?`<div style="background:var(--gol);color:var(--god);padding:10px 13px;border-radius:8px;font-size:11.5px;margin-bottom:14px">Pay to MoMo <b>${esc(DB.store.momoNumber)}</b> (${esc(DB.store.momoName||DB.store.name)}). Your order is confirmed once payment is verified.</div>`:''}
+    <button class="btn bo bfull" style="padding:11px" onclick="placeOrder()">Place Order — ${money(cartTotal())}</button>`;
+}
+async function doCustLogin(prefix){
+  const email=document.getElementById(prefix+'-email').value.trim().toLowerCase();
+  const pass=document.getElementById(prefix+'-pass').value;
+  const c=DB.customers.find(x=>x.email.toLowerCase()===email && x.password===pass);
+  if(!c){ toast('Invalid email or password','err'); return; }
+  CUST=c; sessionStorage.setItem('bk_cust',c.id);
+  toast('Welcome back, '+c.name.split(' ')[0],'ok');
+  pubGo(PUB_VIEW==='checkout'?'checkout':'account');
+}
+async function doCustRegister(prefix){
+  const name=document.getElementById(prefix+'-rname').value.trim();
+  const email=document.getElementById(prefix+'-remail').value.trim().toLowerCase();
+  const phone=document.getElementById(prefix+'-rphone').value.trim();
+  const pass=document.getElementById(prefix+'-rpass').value;
+  if(!name||!email||!pass){ toast('Fill in all fields','err'); return; }
+  if(DB.customers.some(c=>c.email.toLowerCase()===email)){ toast('An account with this email already exists','err'); return; }
+  const c={id:DB.nextCid++,name,email,phone,password:pass,createdAt:today()};
+  DB.customers.push(c);
+  await saveDB();
+  CUST=c; sessionStorage.setItem('bk_cust',c.id);
+  toast('Account created — welcome, '+name.split(' ')[0],'ok');
+  pubGo(PUB_VIEW==='checkout'?'checkout':'account');
+}
+function doCustLogout(){ CUST=null; sessionStorage.removeItem('bk_cust'); toast('Logged out','ok'); pubGo('home'); }
+
+async function placeOrder(){
+  const lines=cartLines();
+  if(!lines.length) return;
+  const name=(document.getElementById('CK-name')||{}).value?.trim();
+  const email=(document.getElementById('CK-email')||{}).value?.trim();
+  const phone=(document.getElementById('CK-phone')||{}).value?.trim();
+  const pay=(document.getElementById('CK-pay')||{}).value||'Mobile Money';
+  if(!name||!email){ toast('Please enter your name and email','err'); return; }
+  const order={
+    id: DB.nextOid++,
+    orderNo: 'ORD-'+String(Date.now()).slice(-8),
+    date: new Date().toISOString(),
+    customerId: CUST?CUST.id:null,
+    buyer:{name,email,phone},
+    items: lines.map(l=>({bookId:l.book.id,title:l.book.title,price:l.book.price,qty:l.qty})),
+    total: cartTotal(),
+    paymentMethod: pay,
+    status:'pending'
+  };
+  DB.orders.push(order);
+  await saveDB();
+  CART=[]; persistCart();
+  toast('Order placed!','ok');
+  pubGo('confirm', order.id);
+}
+function pubConfirmHTML(orderId){
+  const o=DB.orders.find(x=>x.id===orderId);
+  if(!o) return emptyBooksHTML();
+  return `<div class="confirm-wrap">
+    <div class="confirm-check">✓</div>
+    <div style="font-family:var(--serif);font-size:21px;font-weight:700">Order Placed!</div>
+    <p style="color:var(--mu);font-size:12.5px;margin-top:6px">We'll confirm your ${esc(o.paymentMethod)} payment and unlock your downloads shortly.</p>
+    <div class="order-no">${esc(o.orderNo)}</div>
+    <div class="card" style="text-align:left;margin-top:16px">
+      ${o.items.map(i=>`<div class="osum-line"><span>${esc(i.title)} × ${i.qty}</span><span>${money(i.price*i.qty)}</span></div>`).join('')}
+      <div class="osum-total"><span>Total</span><span>${money(o.total)}</span></div>
+    </div>
+    <p style="font-size:11.5px;color:var(--mu);margin-top:16px">Save your order number and email — you can check status and download your books anytime from <b>Account → Track Order</b>, or the button below.</p>
+    <button class="btn bg" style="margin-top:8px" onclick="pubGo('lookup')">Track This Order</button>
+    <button class="btn" style="margin-top:8px" onclick="pubGo('home')">Continue Shopping</button>
+  </div>`;
+}
+
+function pubLookupHTML(){
+  return `<div style="max-width:420px;margin:0 auto" class="card">
+    <div class="ct">👤 Account</div>
+    <div class="cs">Log in to view your orders and downloads, or track a guest order below.</div>
+    ${checkoutLoginHTML()}
+    <p style="text-align:center;font-size:11px;margin:12px 0;color:var(--mu)">— or —</p>
+    <button class="btn bfull" onclick="coSwitch('reg');document.getElementById('CO-tab-login').click?.();" style="display:none"></button>
+    <div style="text-align:center;margin-bottom:14px"><span style="font-size:11.5px;color:var(--gr);font-weight:600;cursor:pointer;text-decoration:underline" onclick="showRegisterOnly()">New here? Create an account</span></div>
+    <div id="REG-only"></div>
+    <hr style="border:none;border-top:1.5px solid #eee;margin:16px 0">
+    <div class="ct" style="font-size:13px">📦 Track a Guest Order</div>
+    <div class="fg"><label>Order Number</label><input id="LK-ono" placeholder="ORD-12345678"></div>
+    <div class="fg"><label>Email used at checkout</label><input id="LK-email"></div>
+    <button class="btn bo bfull" onclick="lookupOrder()">Track Order</button>
+    <div id="LK-result" style="margin-top:14px"></div>
+  </div>`;
+}
+function showRegisterOnly(){
+  document.getElementById('REG-only').innerHTML=`
+    <div class="fg"><label>Full Name</label><input id="RO-name"></div>
+    <div class="fg"><label>Email</label><input id="RO-email"></div>
+    <div class="fg"><label>Phone</label><input id="RO-phone"></div>
+    <div class="fg"><label>Password</label><input id="RO-pass" type="password"></div>
+    <button class="btn bg bfull" onclick="doCustRegister('RO')">Create Account</button>`;
+}
+function lookupOrder(){
+  const ono=document.getElementById('LK-ono').value.trim().toUpperCase();
+  const email=document.getElementById('LK-email').value.trim().toLowerCase();
+  const o=DB.orders.find(x=>x.orderNo.toUpperCase()===ono && x.buyer.email.toLowerCase()===email);
+  const el=document.getElementById('LK-result');
+  if(!o){ el.innerHTML='<div style="background:#fdf0f0;color:#a32d2d;padding:10px 13px;border-radius:8px;font-size:12px">No matching order found.</div>'; return; }
+  el.innerHTML=orderStatusHTML(o);
+}
+function orderStatusHTML(o){
+  const paid=o.status==='paid'||o.status==='completed';
+  return `<div class="card" style="text-align:left">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <b>${esc(o.orderNo)}</b>
+      <span class="bdg ${paid?'bgg':o.status==='cancelled'?'bgr':'bgo'}">${esc(o.status)}</span>
+    </div>
+    ${o.items.map(i=>{
+      const b=DB.books.find(x=>x.id===i.bookId);
+      const link = paid && b ? (b.ebookLink||'') : '';
+      return `<div class="osum-line" style="align-items:center"><span>${esc(i.title)} × ${i.qty}</span>
+        ${paid ? (link?`<a class="btn xs bg" href="${esc(link)}" target="_blank">⬇ Download</a>`:'<span class="bdg bgy">preparing link</span>') : '<span class="bdg bgy">awaiting payment</span>'}
+      </div>`;
+    }).join('')}
+    <div class="osum-total"><span>Total</span><span>${money(o.total)}</span></div>
+  </div>`;
+}
+function pubAccountHTML(){
+  if(!CUST) return pubLookupHTML();
+  return `<div style="max-width:560px;margin:0 auto">
+    <div class="card cmb">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div class="ct">${esc(CUST.name)}</div><div class="cs">${esc(CUST.email)} ${CUST.phone?'· '+esc(CUST.phone):''}</div></div>
+        <button class="btn sm bd" onclick="doCustLogout()">Logout</button>
+      </div>
+    </div>
+    <div class="ct" style="margin-bottom:10px">My Orders</div>
+    ${DB.orders.filter(o=>o.customerId===CUST.id).sort((a,b)=>b.id-a.id).map(o=>orderStatusHTML(o)+'<div style="height:10px"></div>').join('')||'<div class="empty-state"><div class="ic">📦</div>No orders yet.</div>'}
+  </div>`;
+}
+function pubOrdersHTML(){ return pubAccountHTML(); }
+function pubShowAdminLogin(){
+  moOpen(`<div class="mhd"><div class="mtl">🔐 Admin Login</div><div class="mcl" onclick="moClose()">×</div></div>
+    <div class="fg"><label>Username</label><input id="AL-user"></div>
+    <div class="fg"><label>Password</label><input id="AL-pass" type="password"></div>
+    <div id="AL-err"></div>
+    <button class="btn bg bfull" onclick="doAdminLogin()">Login</button>`);
+}
+function doAdminLogin(){
+  const u=document.getElementById('AL-user').value.trim();
+  const p=document.getElementById('AL-pass').value;
+  const user=DB.users.find(x=>x.username===u && x.password===p);
+  if(!user){ document.getElementById('AL-err').innerHTML='<div style="background:#fdf0f0;color:#a32d2d;padding:8px 12px;border-radius:8px;font-size:11.5px;margin-bottom:10px">Invalid credentials.</div>'; return; }
+  ADMIN=user; sessionStorage.setItem('bk_admin',user.id);
+  moClose();
+  toast('Welcome, '+user.name,'ok');
+  showADMIN(); buildNav(); go('dash');
+}
+function doLogout(){ ADMIN=null; sessionStorage.removeItem('bk_admin'); showPUB(); pubGo('home'); }
+
+/* ================= ADMIN NAV / ROUTER ================= */
+const NAVITEMS=[
+  {sec:'Overview'},
+  {id:'dash',label:'Dashboard',icon:'📊'},
+  {sec:'Catalog'},
+  {id:'books',label:'Books',icon:'📚'},
+  {sec:'Sales'},
+  {id:'orders',label:'Orders',icon:'🧾'},
+  {id:'customers',label:'Customers',icon:'👥'},
+  {sec:'System'},
+  {id:'settings',label:'Store Settings',icon:'⚙️'},
+  {id:'access',label:'Access Code',icon:'🔑'},
+];
+function buildNav(){
+  const nav=document.getElementById('NAV');
+  nav.innerHTML=NAVITEMS.map(n=>n.sec?`<div class="nsec">${esc(n.sec)}</div>`:
+    `<div class="ni" id="NI-${n.id}" onclick="go('${n.id}')"><span class="ni-i">${n.icon}</span>${esc(n.label)}</div>`).join('');
+  document.getElementById('U-nm').textContent=ADMIN.name;
+  document.getElementById('U-av').textContent=ADMIN.name.slice(0,1).toUpperCase();
+}
+let CURPAGE='dash';
+function go(id){
+  CURPAGE=id;
+  document.querySelectorAll('.ni').forEach(e=>e.classList.remove('active'));
+  const ni=document.getElementById('NI-'+id); if(ni) ni.classList.add('active');
+  const titles={dash:'Dashboard',books:'Books',orders:'Orders',customers:'Customers',settings:'Store Settings',access:'Access Code'};
+  document.getElementById('PG-title').textContent=titles[id]||'';
+  const C=document.getElementById('CNT');
+  if(id==='dash') C.innerHTML=pgDash();
+  else if(id==='books') pgBooks();
+  else if(id==='orders') pgOrders();
+  else if(id==='customers') pgCustomers();
+  else if(id==='settings') pgSettings();
+  else if(id==='access') pgAccess();
+}
+
+function pgDash(){
+  const revenue=DB.orders.filter(o=>o.status==='paid'||o.status==='completed').reduce((s,o)=>s+o.total,0);
+  const pending=DB.orders.filter(o=>o.status==='pending').length;
+  return `<div class="sg">
+    <div class="st"><div class="sn">${DB.books.filter(b=>b.status!=='hidden').length}</div><div class="sl">Books Listed</div></div>
+    <div class="st"><div class="sn">${DB.orders.length}</div><div class="sl">Total Orders</div></div>
+    <div class="st"><div class="sn">${pending}</div><div class="sl">Pending Orders</div></div>
+    <div class="st"><div class="sn">${money(revenue)}</div><div class="sl">Revenue Collected</div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Recent Orders</div>
+    <div class="tw"><table><thead><tr><th>Order</th><th>Buyer</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>
+    <tbody>${DB.orders.slice().sort((a,b)=>b.id-a.id).slice(0,8).map(o=>`<tr><td>${esc(o.orderNo)}</td><td>${esc(o.buyer.name)}</td><td>${money(o.total)}</td><td><span class="bdg ${o.status==='pending'?'bgo':o.status==='cancelled'?'bgr':'bgg'}">${esc(o.status)}</span></td><td>${o.date.slice(0,10)}</td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--mu)">No orders yet</td></tr>'}</tbody></table></div>
+  </div>`;
+}
+
+/* ---- Books admin ---- */
+function pgBooks(){
+  document.getElementById('CNT').innerHTML=`<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="ct" style="margin-bottom:0">All Books</div>
+      <button class="btn bg" onclick="bookForm()">+ Add Book</button>
+    </div>
+    <div class="tw"><table><thead><tr><th>Cover</th><th>Title</th><th>Author</th><th>Category</th><th>Price</th><th>File</th><th>Status</th><th></th></tr></thead>
+    <tbody>${DB.books.map(b=>`<tr>
+      <td><div style="width:34px;height:44px;border-radius:5px;overflow:hidden;background:#e8f5ee;display:flex;align-items:center;justify-content:center">${b.cover?'<img src="'+b.cover+'" style="width:100%;height:100%;object-fit:cover">':'📘'}</div></td>
+      <td style="font-weight:600">${esc(b.title)}</td>
+      <td>${esc(b.author||'')}</td>
+      <td>${esc(b.category||'')}</td>
+      <td style="font-weight:700;color:var(--gr)">${money(b.price)}</td>
+      <td>${b.ebookFileData?'<span class="bdg bgb">uploaded</span>':b.ebookLink?'<span class="bdg bgg">linked</span>':'<span class="bdg bgr">missing</span>'}</td>
+      <td><span class="bdg ${b.status==='hidden'?'bgy':'bgg'}">${b.status==='hidden'?'hidden':'active'}</span></td>
+      <td style="white-space:nowrap"><button class="btn xs" onclick="bookForm(${b.id})">Edit</button> <button class="btn xs bd" onclick="delBook(${b.id})">Del</button></td>
+    </tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--mu)">No books yet</td></tr>'}</tbody></table></div>
+  </div>`;
+}
+function bookForm(id){
+  const b=id?DB.books.find(x=>x.id===id):{title:'',author:'',category:'',price:0,description:'',cover:'',ebookLink:'',ebookFileName:'',ebookFileData:'',status:'active',featured:false};
+  window.__bookDraft=Object.assign({},b);
+  moOpen(`<div class="mhd"><div class="mtl">${id?'Edit':'Add'} Book</div><div class="mcl" onclick="moClose()">×</div></div>
+    <div class="g2">
+      <div class="fg"><label>Title</label><input id="BF-title" value="${esc(b.title)}"></div>
+      <div class="fg"><label>Author</label><input id="BF-author" value="${esc(b.author)}"></div>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>Category</label><input id="BF-cat" value="${esc(b.category)}" placeholder="Fiction, Self-help..."></div>
+      <div class="fg"><label>Price (${esc(DB.store.currency)})</label><input id="BF-price" type="number" step="0.01" value="${b.price||0}"></div>
+    </div>
+    <div class="fg"><label>Description</label><textarea id="BF-desc">${esc(b.description)}</textarea></div>
+    <div class="fg"><label>Cover Image</label>
+      <div class="file-drop" onclick="document.getElementById('BF-cover-file').click()">📷 Click to upload a cover image</div>
+      <input type="file" id="BF-cover-file" accept="image/*" style="display:none" onchange="handleCoverUpload(this)">
+      <div id="BF-cover-prev" style="margin-top:8px">${b.cover?'<img src="'+b.cover+'" style="width:60px;height:80px;object-fit:cover;border-radius:6px">':''}</div>
+    </div>
+    <hr style="border:none;border-top:1.5px solid #eee;margin:14px 0">
+    <div class="fg">
+      <label>eBook Delivery — recommended: link</label>
+      <input id="BF-link" value="${esc(b.ebookLink||'')}" placeholder="https://drive.google.com/... or any direct download link">
+      <div style="font-size:10.5px;color:var(--mu);margin-top:5px">Upload the actual PDF/EPUB to Google Drive, Dropbox, etc., get a shareable link, and paste it here. This works for files of any size.</div>
+    </div>
+    <div class="fg">
+      <label>— or upload a small file directly (best under ~60KB)</label>
+      <div class="file-drop" onclick="document.getElementById('BF-ebook-file').click()">📄 Click to upload .pdf or .epub</div>
+      <input type="file" id="BF-ebook-file" accept=".pdf,.epub,application/pdf,application/epub+zip" style="display:none" onchange="handleEbookUpload(this)">
+      <div id="BF-ebook-prev" style="margin-top:8px;font-size:11.5px;color:var(--mu)">${b.ebookFileName?'📎 '+esc(b.ebookFileName)+' ('+Math.round((b.ebookFileSize||0)/1024)+' KB)':''}</div>
+    </div>
+    <div class="g2" style="margin-top:14px">
+      <div class="fg"><label>Status</label><select id="BF-status"><option value="active" ${b.status!=='hidden'?'selected':''}>Active</option><option value="hidden" ${b.status==='hidden'?'selected':''}>Hidden</option></select></div>
+      <div class="fg"><label>Featured</label><select id="BF-feat"><option value="0" ${!b.featured?'selected':''}>No</option><option value="1" ${b.featured?'selected':''}>Yes — show on homepage</option></select></div>
+    </div>
+    <button class="btn bg bfull" style="padding:10px;margin-top:6px" onclick="saveBook(${id||'null'})">Save Book</button>`);
+}
+function handleCoverUpload(input){
+  const f=input.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>{ window.__bookDraft.cover=e.target.result; document.getElementById('BF-cover-prev').innerHTML='<img src="'+e.target.result+'" style="width:60px;height:80px;object-fit:cover;border-radius:6px">'; };
+  r.readAsDataURL(f);
+}
+function handleEbookUpload(input){
+  const f=input.files[0]; if(!f) return;
+  if(!/\.(pdf|epub)$/i.test(f.name)){ toast('Only .pdf or .epub files are accepted','err'); input.value=''; return; }
+  if(f.size>80*1024){
+    toast('That file is '+Math.round(f.size/1024)+'KB — JSONBin\'s free plan caps a whole database around 100KB. Use the link field above instead for files this size.','err');
+    input.value=''; return;
+  }
+  const r=new FileReader();
+  r.onload=e=>{
+    window.__bookDraft.ebookFileData=e.target.result;
+    window.__bookDraft.ebookFileName=f.name;
+    window.__bookDraft.ebookFileSize=f.size;
+    document.getElementById('BF-ebook-prev').textContent='📎 '+f.name+' ('+Math.round(f.size/1024)+' KB)';
+    toast('eBook file attached','ok');
+  };
+  r.readAsDataURL(f);
+}
+async function saveBook(id){
+  const title=document.getElementById('BF-title').value.trim();
+  if(!title){ toast('Title is required','err'); return; }
+  const data={
+    title,
+    author:document.getElementById('BF-author').value.trim(),
+    category:document.getElementById('BF-cat').value.trim()||'General',
+    price:+document.getElementById('BF-price').value||0,
+    description:document.getElementById('BF-desc').value.trim(),
+    cover:window.__bookDraft.cover||'',
+    ebookLink:document.getElementById('BF-link').value.trim(),
+    ebookFileData:window.__bookDraft.ebookFileData||'',
+    ebookFileName:window.__bookDraft.ebookFileName||'',
+    ebookFileSize:window.__bookDraft.ebookFileSize||0,
+    status:document.getElementById('BF-status').value,
+    featured:document.getElementById('BF-feat').value==='1'
+  };
+  if(id){ Object.assign(DB.books.find(b=>b.id===id),data); }
+  else{ data.id=DB.nextBid++; data.createdAt=today(); DB.books.push(data); }
+  await saveDB();
+  moClose(); toast('Book saved','ok'); pgBooks();
+}
+function delBook(id){
+  confirmModal('Delete Book','Remove this book from the store? This cannot be undone.','Delete','bd',async()=>{
+    DB.books=DB.books.filter(b=>b.id!==id);
+    await saveDB(); toast('Book deleted','ok'); pgBooks();
+  });
+}
+
+/* ---- Orders admin ---- */
+function pgOrders(){
+  document.getElementById('CNT').innerHTML=`<div class="card">
+    <div class="ct">All Orders</div>
+    <div class="tw"><table><thead><tr><th>Order</th><th>Buyer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th><th></th></tr></thead>
+    <tbody>${DB.orders.slice().sort((a,b)=>b.id-a.id).map(o=>`<tr>
+      <td style="font-family:monospace">${esc(o.orderNo)}</td>
+      <td>${esc(o.buyer.name)}<br><span style="color:var(--mu);font-size:10.5px">${esc(o.buyer.email)}</span></td>
+      <td>${o.items.length}</td>
+      <td style="font-weight:700">${money(o.total)}</td>
+      <td>${esc(o.paymentMethod)}</td>
+      <td><select onchange="setOrderStatus(${o.id},this.value)" style="padding:4px 7px;font-size:11px">
+        ${['pending','paid','completed','cancelled'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}
+      </select></td>
+      <td>${o.date.slice(0,10)}</td>
+      <td><button class="btn xs" onclick="printOrder(${o.id})">🖨</button></td>
+    </tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--mu)">No orders yet</td></tr>'}</tbody></table></div>
+  </div>`;
+}
+async function setOrderStatus(id,status){
+  const o=DB.orders.find(x=>x.id===id); if(!o) return;
+  o.status=status;
+  await saveDB(); toast('Order updated','ok');
+}
+function printOrder(id){
+  const o=DB.orders.find(x=>x.id===id); if(!o) return;
+  document.getElementById('PA').innerHTML=`<div class="rcp">
+    <div class="rch"><div class="rcr">${DB.store.logo?'<img src="'+DB.store.logo+'">':'📚'}</div>
+      <div><div class="rcsn">${esc(DB.store.name)}</div><div class="rcci">${esc(DB.store.phone||'')} ${DB.store.email?'· '+esc(DB.store.email):''}</div></div></div>
+    <div class="rcdt">Order Receipt</div>
+    <div class="rcbd">
+      <div style="font-size:11px;margin-bottom:6px"><b>Order:</b> ${esc(o.orderNo)} &nbsp; <b>Date:</b> ${o.date.slice(0,10)}</div>
+      <div style="font-size:11px;margin-bottom:6px"><b>Buyer:</b> ${esc(o.buyer.name)} (${esc(o.buyer.email)})</div>
+      <table class="rct"><thead><tr><th>Book</th><th>Qty</th><th>Price</th></tr></thead>
+      <tbody>${o.items.map(i=>`<tr><td>${esc(i.title)}</td><td>${i.qty}</td><td>${money(i.price*i.qty)}</td></tr>`).join('')}</tbody></table>
+      <div style="text-align:right;font-weight:700;font-size:13px">Total: ${money(o.total)}</div>
+    </div>
+    <div class="rcft">Thank you for your order</div>
+  </div>`;
+  setTimeout(()=>window.print(),150);
+}
+
+/* ---- Customers admin ---- */
+function pgCustomers(){
+  document.getElementById('CNT').innerHTML=`<div class="card">
+    <div class="ct">Registered Customers</div>
+    <div class="tw"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Orders</th><th>Joined</th></tr></thead>
+    <tbody>${DB.customers.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.email)}</td><td>${esc(c.phone||'')}</td><td>${DB.orders.filter(o=>o.customerId===c.id).length}</td><td>${esc(c.createdAt||'')}</td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--mu)">No registered customers yet</td></tr>'}</tbody></table></div>
+  </div>`;
+}
+
+/* ---- Settings admin ---- */
+function pgSettings(){
+  const s=DB.store;
+  document.getElementById('CNT').innerHTML=`<div class="card" style="max-width:640px">
+    <div class="ct">Store Settings</div>
+    <div class="g2">
+      <div class="fg"><label>Store Name</label><input id="ST-name" value="${esc(s.name)}"></div>
+      <div class="fg"><label>Tagline</label><input id="ST-tag" value="${esc(s.tagline)}"></div>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>Contact Email</label><input id="ST-email" value="${esc(s.email)}"></div>
+      <div class="fg"><label>Contact Phone</label><input id="ST-phone" value="${esc(s.phone)}"></div>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>Mobile Money Number</label><input id="ST-momo" value="${esc(s.momoNumber)}"></div>
+      <div class="fg"><label>Mobile Money Name</label><input id="ST-momon" value="${esc(s.momoName)}"></div>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>Address</label><input id="ST-addr" value="${esc(s.address)}"></div>
+      <div class="fg"><label>Currency Code</label><input id="ST-cur" value="${esc(s.currency)}"></div>
+    </div>
+    <div class="fg"><label>Logo</label>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:50px;height:50px;border-radius:11px;overflow:hidden;background:#e8f5ee;display:flex;align-items:center;justify-content:center">${s.logo?'<img src="'+s.logo+'" style="width:100%;height:100%;object-fit:cover">':'📚'}</div>
+        <button class="btn sm" onclick="document.getElementById('ST-logo-file').click()">Upload Logo</button>
+        <input type="file" id="ST-logo-file" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
+      </div>
+    </div>
+    <button class="btn bg" style="margin-top:8px" onclick="saveSettings()">Save Settings</button>
+  </div>`;
+}
+window.__logoDraft=null;
+function handleLogoUpload(input){
+  const f=input.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>{ window.__logoDraft=e.target.result; pgSettings(); document.querySelector('#CNT div[style*="border-radius:11px"]').innerHTML='<img src="'+e.target.result+'" style="width:100%;height:100%;object-fit:cover">'; };
+  r.readAsDataURL(f);
+}
+async function saveSettings(){
+  Object.assign(DB.store,{
+    name:document.getElementById('ST-name').value.trim(),
+    tagline:document.getElementById('ST-tag').value.trim(),
+    email:document.getElementById('ST-email').value.trim(),
+    phone:document.getElementById('ST-phone').value.trim(),
+    momoNumber:document.getElementById('ST-momo').value.trim(),
+    momoName:document.getElementById('ST-momon').value.trim(),
+    address:document.getElementById('ST-addr').value.trim(),
+    currency:document.getElementById('ST-cur').value.trim()||'GHS'
+  });
+  if(window.__logoDraft) DB.store.logo=window.__logoDraft;
+  await saveDB();
+  applyBranding();
+  toast('Settings saved','ok');
+}
+
+/* ---- Access code admin ---- */
+function pgAccess(){
+  document.getElementById('CNT').innerHTML=`<div class="card" style="max-width:560px">
+    <div class="ct">Share Store Access</div>
+    <div class="cs">Anyone with this code can connect to the SAME live database from another device (their own copy of this file, via "Connect with access code" on setup) — this only grants the restricted public key, never your Master Key.</div>
+    <textarea readonly style="font-family:monospace;font-size:11px;min-height:70px" onclick="this.select()">${getAccessCode()}</textarea>
+    <button class="btn sm bg" style="margin-top:8px" onclick="navigator.clipboard.writeText('${getAccessCode()}');toast('Copied','ok')">Copy Code</button>
+    <hr style="border:none;border-top:1.5px solid #eee;margin:16px 0">
+    <div class="ct" style="font-size:13px">Download Public Store File</div>
+    <div class="cs">Re-download the file with your live credentials baked in, ready to host publicly.</div>
+    <button class="btn bo" onclick="downloadConfiguredFile()">⬇ Download Store File</button>
+  </div>`;
+}
+</script>
+</body>
+</html>
