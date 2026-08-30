@@ -429,7 +429,7 @@ async function accessKeyCreate(masterKey, binId){
     method:'POST',
     headers:{'Content-Type':'application/json','X-Master-Key':masterKey,'X-Key-Name':'BookStore-Public-'+Date.now()},
     body:JSON.stringify({
-      bins:{ [binId]: { read:true, update:true, delete:false } }
+      bins:{ read:true, update:true, delete:false, create:false }
     })
   });
   const j = await r.json();
