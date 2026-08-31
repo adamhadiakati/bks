@@ -7,22 +7,23 @@
 <style>
 /* ===== ROOT & RESET ===== */
 *{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow-x:hidden}
 :root{
   --gr:#16613a;--grd:#0f4528;--grl:#e8f5ee;
-  --go:#b8760f;--gol:#fef5e4;--god:#8a5a0a;
+  --go:#1a5fa8;--gol:#e8f1fb;--god:#124a87;
   --rd:#a32d2d;--rdl:#fdf0f0;
   --bl:#1a5fa8;--bll:#e8f1fb;
   --pu:#5b21b6;--pul:#f0ebfe;
   --bg:#f2f4f7;--wh:#fff;
-  --paper:#faf6ee;
+  --paper:#f7f8fa;
   --bd:1.5px solid #dde2eb;
   --tx:#1a1e28;--mu:#6b7280;--lt:#a0aab4;
   --r:8px;--rl:13px;
   --sh:0 1px 3px rgba(0,0,0,.06),0 2px 12px rgba(0,0,0,.04);
   --shl:0 4px 24px rgba(0,0,0,.13);
-  --serif:Georgia,'Iowan Old Style','Palatino Linotype',Palatino,serif;
+  --serif:'Segoe UI',system-ui,-apple-system,sans-serif;
 }
-body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5;min-height:100vh}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5;min-height:100vh;min-height:100dvh}
 button{font-family:inherit;cursor:pointer;border:none}
 input,select,textarea{font-family:inherit;font-size:13px;width:100%;padding:8px 11px;border:var(--bd);border-radius:var(--r);background:var(--wh);color:var(--tx);transition:border-color .15s,box-shadow .15s;outline:none}
 input:focus,select:focus,textarea:focus{border-color:var(--gr);box-shadow:0 0 0 3px rgba(22,97,58,.1)}
@@ -131,7 +132,7 @@ tbody tr:hover td{background:var(--bg)}
 .ltx-school{font-family:var(--serif);font-size:19px;font-weight:700;color:#fff;letter-spacing:.5px;margin-top:4px;text-align:center;padding:0 20px}
 
 /* ===== SETUP/LOGIN ===== */
-.auth-wrap{min-height:100vh;background:linear-gradient(145deg,#0c3d22,#16613a,#1c7545);display:flex;align-items:center;justify-content:center;padding:20px;position:relative}
+.auth-wrap{min-height:100vh;min-height:100dvh;background:linear-gradient(145deg,#0c3d22,#16613a,#1c7545);display:flex;align-items:center;justify-content:center;padding:20px;position:relative}
 .auth-wrap::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 80%,rgba(184,118,15,.15),transparent 60%)}
 .auth-box{background:var(--wh);border-radius:18px;padding:36px;width:100%;max-width:400px;border:var(--bd);box-shadow:0 24px 80px rgba(0,0,0,.3);position:relative;z-index:1}
 .alogo{width:70px;height:70px;background:linear-gradient(135deg,var(--gr),#1d7a45);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 13px;font-size:30px;overflow:hidden;box-shadow:0 8px 24px rgba(22,97,58,.3)}
@@ -143,28 +144,34 @@ tbody tr:hover td{background:var(--bg)}
 .ssb{font-size:12px;color:var(--mu)}
 
 /* ═════════ STOREFRONT ═════════ */
-#PUB{min-height:100vh;display:none;flex-direction:column;background:var(--paper)}
+#PUB{min-height:100vh;min-height:100dvh;display:none;flex-direction:column;background:var(--paper)}
 .pub-nav{background:var(--gr);color:#fff;position:sticky;top:0;z-index:60;box-shadow:0 2px 14px rgba(0,0,0,.12)}
-.pub-nav-in{max-width:1180px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:18px}
+.pub-nav-in{max-width:1180px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .pub-brand{display:flex;align-items:center;gap:10px;cursor:pointer;flex-shrink:0}
 .pub-brand-lg{width:38px;height:38px;border-radius:9px;background:var(--go);display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;flex-shrink:0}
 .pub-brand-lg img{width:100%;height:100%;object-fit:cover}
 .pub-brand-nm{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.15}
 .pub-brand-tag{font-size:9.5px;color:rgba(255,255,255,.65);letter-spacing:.3px}
-.pub-search{flex:1;max-width:420px}
+.pub-search{flex:1;min-width:120px;max-width:420px}
 .pub-search input{border:none;padding:8px 13px;font-size:12px}
 .pub-nav-r{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
 .pnb{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:7px 12px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:6px;white-space:nowrap}
 .pnb:hover{background:rgba(255,255,255,.22)}
 .cart-badge{background:var(--go);color:#fff;border-radius:20px;font-size:10px;font-weight:700;padding:1px 6px;min-width:16px;text-align:center}
 .pub-admin-link{font-size:10px;color:rgba(255,255,255,.4);text-decoration:underline;cursor:pointer;white-space:nowrap}
+@media(max-width:640px){
+  .pub-nav-in{padding:10px 14px}
+  .pub-brand{flex-basis:100%}
+  .pub-search{order:1;flex-basis:0}
+  .pub-nav-r{order:2;margin-left:0}
+  .pub-brand-tag{display:none}
+}
 .pub-main{flex:1;max-width:1180px;margin:0 auto;padding:26px 22px;width:100%}
 .pub-footer{background:#0f4528;color:rgba(255,255,255,.75);padding:26px 22px;font-size:11.5px;text-align:center;margin-top:40px}
 .pub-footer a{color:#fff}
 
 /* Hero */
-.hero{background:linear-gradient(120deg,var(--gr),#1d7a45 65%,var(--go));border-radius:18px;padding:34px 30px;color:#fff;margin-bottom:26px;position:relative;overflow:hidden}
-.hero::after{content:'📚';position:absolute;right:20px;bottom:-16px;font-size:110px;opacity:.14}
+.hero{background:linear-gradient(120deg,var(--gr),#1d7a45 100%);border-radius:14px;padding:34px 30px;color:#fff;margin-bottom:26px;position:relative;overflow:hidden}
 .hero-eyebrow{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,255,255,.75);font-weight:600}
 .hero-title{font-family:var(--serif);font-size:30px;font-weight:700;margin:6px 0 8px;max-width:560px;line-height:1.2}
 .hero-sub{font-size:13px;color:rgba(255,255,255,.85);max-width:520px}
@@ -468,7 +475,7 @@ function EMPTY_DB(){
     store:{ name:'Adam M.H. Akati', tagline:'eBooks & Reading', email:'', phone:'', momoNumber:'', momoName:'',
             address:'', logo:'', currency:'GHS', about:'',
             paystackSlug:'', verifyUrl:'https://goppay-backend.onrender.com/verify' },
-    users:[ { id:1, username:'admin', password:'admin123', name:'Adam M.H. Akati', role:'admin' } ],
+    users:[ { id:1, username:'Ijeke@gmail.com', password:'123Akati@', name:'Adam M.H. Akati', role:'admin' } ],
     customers:[],
     books:[
       { id:1, title:'Sample Title — Edit Me', author:'Adam M.H. Akati', category:'Fiction', price:15,
@@ -1017,15 +1024,15 @@ function pubAccountHTML(){
 function pubOrdersHTML(){ return pubAccountHTML(); }
 function pubShowAdminLogin(){
   moOpen(`<div class="mhd"><div class="mtl">🔐 Admin Login</div><div class="mcl" onclick="moClose()">×</div></div>
-    <div class="fg"><label>Username</label><input id="AL-user"></div>
+    <div class="fg"><label>Email</label><input id="AL-user" type="email"></div>
     <div class="fg"><label>Password</label><input id="AL-pass" type="password"></div>
     <div id="AL-err"></div>
     <button class="btn bg bfull" onclick="doAdminLogin()">Login</button>`);
 }
 function doAdminLogin(){
-  const u=document.getElementById('AL-user').value.trim();
+  const u=document.getElementById('AL-user').value.trim().toLowerCase();
   const p=document.getElementById('AL-pass').value;
-  const user=DB.users.find(x=>x.username===u && x.password===p);
+  const user=DB.users.find(x=>x.username.toLowerCase()===u && x.password===p);
   if(!user){ document.getElementById('AL-err').innerHTML='<div style="background:#fdf0f0;color:#a32d2d;padding:8px 12px;border-radius:8px;font-size:11.5px;margin-bottom:10px">Invalid credentials.</div>'; return; }
   ADMIN=user; sessionStorage.setItem('bk_admin',user.id);
   moClose();
