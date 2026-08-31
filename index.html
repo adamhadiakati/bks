@@ -466,7 +466,8 @@ async function saveDB(){
 function EMPTY_DB(){
   return {
     store:{ name:'Adam M.H. Akati', tagline:'eBooks & Reading', email:'', phone:'', momoNumber:'', momoName:'',
-            address:'', logo:'', currency:'GHS', about:'' },
+            address:'', logo:'', currency:'GHS', about:'',
+            paystackSlug:'', verifyUrl:'https://goppay-backend.onrender.com/verify' },
     users:[ { id:1, username:'admin', password:'admin123', name:'Adam M.H. Akati', role:'admin' } ],
     customers:[],
     books:[
@@ -496,6 +497,7 @@ function normaliseDB(d){
 /* ================= BOOT ================= */
 window.addEventListener('DOMContentLoaded', boot);
 async function boot(){
+  if(checkBookPaystackReturn()) return;
   document.getElementById('LSCHOOL').textContent='ADAM M.H. AKATI — BOOKS';
   if(!BIN_ID || !ACCESS_KEY){
     document.getElementById('PG-setup').style.display='flex';
@@ -796,16 +798,118 @@ function checkoutFormHTML(){
   return `<div class="fg"><label>Full Name</label><input id="CK-name" value="${esc(name)}"></div>
     <div class="g2">
       <div class="fg"><label>Email (for delivery)</label><input id="CK-email" value="${esc(email)}"></div>
-      <div class="fg"><label>Phone (Mobile Money)</label><input id="CK-phone" value="${esc(phone)}"></div>
+      <div class="fg"><label>Phone</label><input id="CK-phone" value="${esc(phone)}"></div>
     </div>
-    <div class="fg"><label>Payment Method</label>
-      <select id="CK-pay">
-        <option>Mobile Money</option>
-        <option>Cash (in person)</option>
-      </select>
-    </div>
-    ${DB.store.momoNumber?`<div style="background:var(--gol);color:var(--god);padding:10px 13px;border-radius:8px;font-size:11.5px;margin-bottom:14px">Pay to MoMo <b>${esc(DB.store.momoNumber)}</b> (${esc(DB.store.momoName||DB.store.name)}). Your order is confirmed once payment is verified.</div>`:''}
-    <button class="btn bo bfull" style="padding:11px" onclick="placeOrder()">Place Order — ${money(cartTotal())}</button>`;
+    <div style="background:var(--gol);color:var(--god);padding:10px 13px;border-radius:8px;font-size:11.5px;margin-bottom:14px">🔒 Secure checkout via Paystack — pay by Mobile Money, card, or bank transfer. Your books unlock automatically the moment payment is confirmed.</div>
+    <button class="btn bo bfull" id="CK-pay-btn" style="padding:11px" onclick="payWithPaystack()">💳 Pay Now with Paystack — ${money(cartTotal())}</button>`;
+}
+let _bkPayWindow=null, _bkPayCheckInterval=null;
+function payWithPaystack(){
+  const lines=cartLines();
+  if(!lines.length) return;
+  const name=(document.getElementById('CK-name')||{}).value?.trim();
+  const email=(document.getElementById('CK-email')||{}).value?.trim();
+  const phone=(document.getElementById('CK-phone')||{}).value?.trim();
+  if(!name||!email){ toast('Please enter your name and email','err'); return; }
+  if(!DB.store.paystackSlug){ toast('Store owner: set a Paystack Payment Page slug in Admin → Store Settings first','err'); return; }
+
+  const ref='BOOK'+Date.now();
+  const pending={ ref, buyer:{name,email,phone},
+    items: lines.map(l=>({bookId:l.book.id,title:l.book.title,price:l.book.price,qty:l.qty})),
+    total: cartTotal(), customerId: CUST?CUST.id:null };
+  localStorage.setItem('bk_pending_order', JSON.stringify(pending));
+
+  const btn=document.getElementById('CK-pay-btn');
+  const restoreBtn=()=>{ if(btn){ btn.disabled=false; btn.innerHTML='💳 Pay Now with Paystack — '+money(pending.total); } };
+  if(btn){ btn.disabled=true; btn.innerHTML='⏳ Opening Paystack...'; }
+
+  const callbackUrl = window.location.href.split('?')[0]+'?order_callback=1&ref='+encodeURIComponent(ref);
+  const url = 'https://paystack.shop/pay/'+DB.store.paystackSlug
+    +'?email='+encodeURIComponent(email)
+    +'&name='+encodeURIComponent(name)
+    +'&amount='+Math.round(pending.total*100)
+    +'&callback_url='+encodeURIComponent(callbackUrl);
+
+  const w=600,h=700,left=(screen.width/2)-(w/2),top=(screen.height/2)-(h/2);
+  _bkPayWindow=window.open(url,'PaystackBookPayment','width='+w+',height='+h+',top='+top+',left='+left+',scrollbars=yes,resizable=yes');
+
+  if(!_bkPayWindow || _bkPayWindow.closed || typeof _bkPayWindow.closed==='undefined'){
+    restoreBtn();
+    confirmModal('Open Paystack','Popup was blocked by your browser. Continue to Paystack in this tab? You\'ll be brought back here after payment.','Continue','bg',()=>{ window.location.href=url; });
+    return;
+  }
+
+  if(_bkPayCheckInterval) clearInterval(_bkPayCheckInterval);
+  _bkPayCheckInterval=setInterval(function(){
+    if(!_bkPayWindow||_bkPayWindow.closed){
+      clearInterval(_bkPayCheckInterval);
+      restoreBtn();
+      let verified=null, failed=false;
+      try{ verified=JSON.parse(localStorage.getItem('bk_order_verified_'+ref)||'null'); }catch(e){}
+      try{ failed=!!localStorage.getItem('bk_order_failed_'+ref); }catch(e){}
+      localStorage.removeItem('bk_order_verified_'+ref);
+      localStorage.removeItem('bk_order_failed_'+ref);
+      if(verified && verified.orderId){
+        localStorage.removeItem('bk_pending_order');
+        CART=[]; persistCart();
+        dbRead().then(fresh=>{ DB=normaliseDB(fresh); pubGo('confirm', verified.orderId); })
+          .catch(()=>{ pubGo('confirm', verified.orderId); });
+      } else if(failed){
+        toast('Payment could not be verified. If money was deducted, contact support with reference '+ref,'err');
+      } else {
+        toast('Payment window closed before completing. If you paid, it may still confirm shortly.','info');
+      }
+    }
+  },500);
+}
+function checkBookPaystackReturn(){
+  const p=new URLSearchParams(window.location.search);
+  if(p.get('order_callback')!=='1') return false;
+  const ref=p.get('ref');
+  try{ window.history.replaceState({},'',window.location.pathname); }catch(e){}
+  if(!ref) return false;
+  let pending=null;
+  try{ pending=JSON.parse(localStorage.getItem('bk_pending_order')||'null'); }catch(e){}
+  if(!pending||pending.ref!==ref) return false;
+
+  const isPopup = !!(window.opener && !window.opener.closed);
+  const verifyUrl = (DB&&DB.store&&DB.store.verifyUrl) || localStorage.getItem('bk_verify_url') || 'https://goppay-backend.onrender.com/verify';
+  const statusScreen=(emoji,title,sub)=>'<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:sans-serif;flex-direction:column;gap:10px;text-align:center;padding:20px"><div style="font-size:44px">'+emoji+'</div><div style="font-size:16px;font-weight:700">'+title+'</div><div style="font-size:12.5px;color:#666">'+sub+'</div></div>';
+
+  if(isPopup) document.body.innerHTML=statusScreen('⏳','Verifying your payment…','Please wait a moment');
+  else loading(true,'Verifying your payment...');
+
+  fetch(verifyUrl+'?reference='+encodeURIComponent(ref))
+    .then(r=>r.json())
+    .then(async data=>{
+      if(data.verified){
+        const fresh = normaliseDB(await dbRead().catch(()=>EMPTY_DB()));
+        const order={ id: fresh.nextOid++, orderNo:'ORD-'+String(Date.now()).slice(-8), date:new Date().toISOString(),
+          customerId: pending.customerId, buyer: pending.buyer, items: pending.items, total: pending.total,
+          paymentMethod:'Paystack', paystackRef: ref, status:'paid' };
+        fresh.orders.push(order);
+        await dbWrite(fresh);
+        localStorage.removeItem('bk_pending_order');
+        if(isPopup){
+          localStorage.setItem('bk_order_verified_'+ref, JSON.stringify({orderId:order.id}));
+          document.body.innerHTML=statusScreen('✅','Payment confirmed!','You can close this window now.');
+          setTimeout(()=>window.close(),1200);
+        } else {
+          DB=fresh; CART=[]; persistCart();
+          loading(false); applyBranding(); showPUB(); pubGo('confirm', order.id);
+        }
+      } else {
+        localStorage.setItem('bk_order_failed_'+ref,'1');
+        if(isPopup) document.body.innerHTML=statusScreen('⚠️','Payment not verified','Close this window and try again.');
+        else { loading(false); toast('Payment could not be verified. Please try again.','err'); boot(); }
+      }
+    })
+    .catch(()=>{
+      localStorage.setItem('bk_order_failed_'+ref,'1');
+      if(isPopup) document.body.innerHTML=statusScreen('⚠️','Could not reach verification server','Close this window and try again, or contact support with reference '+esc(ref)+'.');
+      else { loading(false); toast('Could not reach verification server. Reference: '+ref,'err'); boot(); }
+    });
+  return true;
 }
 async function doCustLogin(prefix){
   const email=document.getElementById(prefix+'-email').value.trim().toLowerCase();
@@ -832,45 +936,17 @@ async function doCustRegister(prefix){
 }
 function doCustLogout(){ CUST=null; sessionStorage.removeItem('bk_cust'); toast('Logged out','ok'); pubGo('home'); }
 
-async function placeOrder(){
-  const lines=cartLines();
-  if(!lines.length) return;
-  const name=(document.getElementById('CK-name')||{}).value?.trim();
-  const email=(document.getElementById('CK-email')||{}).value?.trim();
-  const phone=(document.getElementById('CK-phone')||{}).value?.trim();
-  const pay=(document.getElementById('CK-pay')||{}).value||'Mobile Money';
-  if(!name||!email){ toast('Please enter your name and email','err'); return; }
-  const order={
-    id: DB.nextOid++,
-    orderNo: 'ORD-'+String(Date.now()).slice(-8),
-    date: new Date().toISOString(),
-    customerId: CUST?CUST.id:null,
-    buyer:{name,email,phone},
-    items: lines.map(l=>({bookId:l.book.id,title:l.book.title,price:l.book.price,qty:l.qty})),
-    total: cartTotal(),
-    paymentMethod: pay,
-    status:'pending'
-  };
-  DB.orders.push(order);
-  await saveDB();
-  CART=[]; persistCart();
-  toast('Order placed!','ok');
-  pubGo('confirm', order.id);
-}
 function pubConfirmHTML(orderId){
   const o=DB.orders.find(x=>x.id===orderId);
   if(!o) return emptyBooksHTML();
+  const paid=o.status==='paid'||o.status==='completed';
   return `<div class="confirm-wrap">
     <div class="confirm-check">✓</div>
-    <div style="font-family:var(--serif);font-size:21px;font-weight:700">Order Placed!</div>
-    <p style="color:var(--mu);font-size:12.5px;margin-top:6px">We'll confirm your ${esc(o.paymentMethod)} payment and unlock your downloads shortly.</p>
+    <div style="font-family:var(--serif);font-size:21px;font-weight:700">${paid?'Payment Confirmed!':'Order Placed!'}</div>
+    <p style="color:var(--mu);font-size:12.5px;margin-top:6px">${paid?'Your books are ready to download below.':'We\'re confirming your payment — refresh in a moment.'}</p>
     <div class="order-no">${esc(o.orderNo)}</div>
-    <div class="card" style="text-align:left;margin-top:16px">
-      ${o.items.map(i=>`<div class="osum-line"><span>${esc(i.title)} × ${i.qty}</span><span>${money(i.price*i.qty)}</span></div>`).join('')}
-      <div class="osum-total"><span>Total</span><span>${money(o.total)}</span></div>
-    </div>
-    <p style="font-size:11.5px;color:var(--mu);margin-top:16px">Save your order number and email — you can check status and download your books anytime from <b>Account → Track Order</b>, or the button below.</p>
-    <button class="btn bg" style="margin-top:8px" onclick="pubGo('lookup')">Track This Order</button>
+    ${orderStatusHTML(o)}
+    <p style="font-size:11.5px;color:var(--mu);margin-top:16px">Save your order number and email — you can return anytime via <b>Account → Track Order</b>.</p>
     <button class="btn" style="margin-top:8px" onclick="pubGo('home')">Continue Shopping</button>
   </div>`;
 }
@@ -1190,6 +1266,13 @@ function pgSettings(){
       <div class="fg"><label>Address</label><input id="ST-addr" value="${esc(s.address)}"></div>
       <div class="fg"><label>Currency Code</label><input id="ST-cur" value="${esc(s.currency)}"></div>
     </div>
+    <hr style="border:none;border-top:1.5px solid #eee;margin:16px 0">
+    <div class="ct" style="font-size:13px">💳 Paystack Checkout</div>
+    <div class="cs">Create one <b>flexible / variable-amount</b> Payment Page at dashboard.paystack.com → Payment Pages (leave Amount blank), then paste its slug (the part after <code>/pay/</code>) below.</div>
+    <div class="g2">
+      <div class="fg"><label>Paystack Payment Page Slug</label><input id="ST-pslug" value="${esc(s.paystackSlug)}" placeholder="e.g. adam-akati-books"></div>
+      <div class="fg"><label>Verify Server URL</label><input id="ST-vurl" value="${esc(s.verifyUrl)}"></div>
+    </div>
     <div class="fg"><label>Logo</label>
       <div style="display:flex;align-items:center;gap:12px">
         <div style="width:50px;height:50px;border-radius:11px;overflow:hidden;background:#e8f5ee;display:flex;align-items:center;justify-content:center">${s.logo?'<img src="'+s.logo+'" style="width:100%;height:100%;object-fit:cover">':'📚'}</div>
@@ -1216,7 +1299,9 @@ async function saveSettings(){
     momoNumber:document.getElementById('ST-momo').value.trim(),
     momoName:document.getElementById('ST-momon').value.trim(),
     address:document.getElementById('ST-addr').value.trim(),
-    currency:document.getElementById('ST-cur').value.trim()||'GHS'
+    currency:document.getElementById('ST-cur').value.trim()||'GHS',
+    paystackSlug:document.getElementById('ST-pslug').value.trim(),
+    verifyUrl:document.getElementById('ST-vurl').value.trim()||'https://goppay-backend.onrender.com/verify'
   });
   if(window.__logoDraft) DB.store.logo=window.__logoDraft;
   await saveDB();
