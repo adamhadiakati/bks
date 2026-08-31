@@ -98,5 +98,226 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
     attachSaveFeedback();
   })();
 </script>
-<script src="https://replit-cdn.com/replit-pill/replit-pill.global.js" data-repl-id="9454a3c5-58ba-440d-abf5-fdf37289eb4c"></script></body>
+<script>
+  (() => {
+    const appFetch = window.fetch.bind(window);
+    const readJson = (key) => {
+      try {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const findField = (container, labelText) =>
+      [...container.querySelectorAll(".field")].find(
+        (field) =>
+          field.querySelector("label")?.textContent?.trim() === labelText,
+      );
+
+    const getBookModal = () =>
+      [...document.querySelectorAll(".modal")].find((modal) =>
+        [...modal.querySelectorAll("button")].some(
+          (button) => button.textContent?.trim() === "Save book",
+        ),
+      );
+
+    window.__pendingBookPayment = null;
+
+    window.fetch = (input, init = {}) => {
+      const url = typeof input === "string" ? input : input?.url || "";
+      const method = String(init.method || "GET").toUpperCase();
+      const pending = window.__pendingBookPayment;
+
+      if (
+        method === "PUT" &&
+        url.includes("api.jsonbin.io") &&
+        pending &&
+        typeof init.body === "string"
+      ) {
+        try {
+          const body = JSON.parse(init.body);
+          const book =
+            body.books?.find(
+              (item) =>
+                item.title === pending.title &&
+                (!pending.author || item.author === pending.author),
+            ) || body.books?.find((item) => item.title === pending.title);
+          if (book) {
+            book.paystackSlug = pending.slug;
+            init = { ...init, body: JSON.stringify(body) };
+          }
+        } catch {
+          // Leave non-JSON requests unchanged.
+        }
+      }
+
+      return appFetch(input, init);
+    };
+
+    const saveBookPaymentSlug = () => {
+      const modal = getBookModal();
+      if (!modal) return;
+
+      const titleInput = findField(modal, "Title")?.querySelector("input");
+      const authorInput = findField(modal, "Author")?.querySelector("input");
+      const slugInput = modal.querySelector("[data-book-paystack-slug]");
+      if (!titleInput || !slugInput) return;
+
+      window.__pendingBookPayment = {
+        title: titleInput.value.trim(),
+        author: authorInput?.value.trim() || "",
+        slug: slugInput.value.trim(),
+      };
+
+      window.setTimeout(() => {
+        const data = readJson("bk_cache");
+        const pending = window.__pendingBookPayment;
+        if (!data?.books || !pending?.title) return;
+
+        const book =
+          data.books.find(
+            (item) =>
+              item.title === pending.title &&
+              (!pending.author || item.author === pending.author),
+          ) || data.books.find((item) => item.title === pending.title);
+        if (!book) return;
+
+        book.paystackSlug = pending.slug;
+        localStorage.setItem("bk_cache", JSON.stringify(data));
+      }, 0);
+    };
+
+    const attachBookPaymentField = () => {
+      const modal = getBookModal();
+      if (!modal) return;
+
+      const saveButton = [...modal.querySelectorAll("button")].find(
+        (button) => button.textContent?.trim() === "Save book",
+      );
+      if (!saveButton) return;
+
+      let slugInput = modal.querySelector("[data-book-paystack-slug]");
+      if (!slugInput) {
+        const deliveryField = findField(modal, "eBook delivery link");
+        const field = document.createElement("div");
+        field.className = "field";
+        field.innerHTML =
+          '<label>Payment page slug</label><input type="text" placeholder="book-payment-page-slug" data-book-paystack-slug><div class="admin-card-sub">Optional. Leave blank to use the store-wide payment page.</div>';
+        if (deliveryField?.parentElement) {
+          deliveryField.parentElement.insertBefore(field, deliveryField.nextSibling);
+        } else {
+          saveButton.parentElement?.insertBefore(field, saveButton);
+        }
+        slugInput = field.querySelector("[data-book-paystack-slug]");
+
+        const data = readJson("bk_cache");
+        const title = findField(modal, "Title")?.querySelector("input")?.value;
+        const author = findField(modal, "Author")?.querySelector("input")?.value;
+        const existing =
+          data?.books?.find(
+            (item) =>
+              item.title === title &&
+              (!author || item.author === author),
+          ) || data?.books?.find((item) => item.title === title);
+        if (slugInput && existing?.paystackSlug) {
+          slugInput.value = existing.paystackSlug;
+        }
+      }
+
+      if (saveButton.dataset.paymentSlugBound !== "true") {
+        saveButton.dataset.paymentSlugBound = "true";
+        saveButton.addEventListener("click", saveBookPaymentSlug, true);
+      }
+    };
+
+    const connectConfiguredJsonbin = async (button) => {
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Connecting…";
+      }
+      try {
+        const response = await appFetch("/api/jsonbin/connect", {
+          method: "POST",
+        });
+        const result = await response.json();
+        if (!response.ok || !result.accessCode) {
+          throw new Error(result.message || "Could not connect to JSONBin.");
+        }
+
+        const decoded = JSON.parse(atob(result.accessCode));
+        localStorage.setItem("bk_bin", decoded.b);
+        localStorage.setItem("bk_key", decoded.k);
+        if (result.record) {
+          localStorage.setItem("bk_cache", JSON.stringify(result.record));
+        }
+        window.location.reload();
+      } catch (error) {
+        if (button) {
+          button.disabled = false;
+          button.textContent = "Connect my JSONBin securely";
+          button.title =
+            error instanceof Error
+              ? error.message
+              : "Could not connect to JSONBin.";
+        }
+      }
+    };
+
+    const attachJsonbinButton = () => {
+      const modal = [...document.querySelectorAll(".modal")].find((item) =>
+        item.textContent?.includes("JSONBin Master Key"),
+      );
+      const form = modal?.querySelector("form");
+      if (!modal || !form || modal.querySelector("[data-jsonbin-connect]")) {
+        return;
+      }
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "outline-action";
+      button.dataset.jsonbinConnect = "true";
+      button.style.cssText = "width:100%;margin-top:10px;";
+      button.textContent = "Connect my JSONBin securely";
+      button.addEventListener("click", () => connectConfiguredJsonbin(button));
+      form.insertAdjacentElement("afterend", button);
+    };
+
+    const nativeOpen = window.open.bind(window);
+    window.open = (url, target, features, replace) => {
+      let nextUrl = url;
+      if (typeof url === "string" && url.includes("paystack.shop/pay/")) {
+        const data = readJson("bk_cache");
+        const cart = readJson("bk_cart") || [];
+        const slug = cart
+          .map((line) => data?.books?.find((book) => book.id === line.bookId))
+          .map((book) => book?.paystackSlug?.trim())
+          .find(Boolean);
+        if (slug) {
+          const parsed = new URL(url, window.location.href);
+          parsed.pathname = `/pay/${encodeURIComponent(slug)}`;
+          nextUrl = parsed.toString();
+        }
+      }
+      return nativeOpen(nextUrl, target, features, replace);
+    };
+
+    const observer = new MutationObserver(() => {
+      attachBookPaymentField();
+      attachJsonbinButton();
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    attachBookPaymentField();
+    attachJsonbinButton();
+
+    if (
+      window.location.protocol !== "file:" &&
+      !(localStorage.getItem("bk_bin") && localStorage.getItem("bk_key"))
+    ) {
+      connectConfiguredJsonbin();
+    }
+  })();
+</script>
+<script src="https://replit-cdn.com/replit-pill/replit-pill.global.js" data-repl-id="91226334-64dd-42a4-8f21-0e7fb4e916da"></script></body>
 </html>
