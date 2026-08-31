@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+  <head><script>window.__BOOKSTORE_API_BASE__="https://6a1b210f-35ab-4ae1-817e-c2bed39c718c-00-2nlo2n6q2sqa8.worf.replit.dev/api";</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
     <title>Adam M.H. Akati — Books</title>
@@ -25,20 +25,22 @@
 </style>
 <script>
   (() => {
+    const apiBase = String(window.__BOOKSTORE_API_BASE__ || "/api").replace(/\/$/, "");
+    const apiUrl = (path) => `${apiBase}${path}`;
     const nativeGetItem = Storage.prototype.getItem;
     const nativeSetItem = Storage.prototype.setItem;
     const sessionKeys = new Set(["bk_admin", "bk_cust", "bk_customer"]);
 
     try {
       const request = new XMLHttpRequest();
-      request.open("GET", "/api/back4app/data", false);
+      request.open("GET", apiUrl("/back4app/data"), false);
       request.send();
       if (request.status >= 200 && request.status < 300) {
         const response = JSON.parse(request.responseText);
         const savedData = response?.data;
         if (savedData && typeof savedData === "object" && !Array.isArray(savedData)) {
           Object.entries(savedData).forEach(([key, value]) => {
-            if (sessionKeys.has(key) || nativeGetItem.call(localStorage, key) !== null) return;
+            if (sessionKeys.has(key)) return;
             nativeSetItem.call(
               localStorage,
               key,
@@ -83,6 +85,8 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
 <script>
   (() => {
     const selector = '[data-testid="button-save-settings"]';
+    const apiBase = String(window.__BOOKSTORE_API_BASE__ || "/api").replace(/\/$/, "");
+    const apiUrl = (path) => `${apiBase}${path}`;
     const nativeFetch = window.fetch.bind(window);
 
     window.fetch = (input, init = {}) => {
@@ -93,7 +97,7 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
       }
 
       if (method === "GET" && url.includes("/latest")) {
-        return nativeFetch("/api/back4app/data").then(async (response) => {
+        return nativeFetch(apiUrl("/back4app/data")).then(async (response) => {
           const payload = await response.json();
           return new Response(JSON.stringify({ record: payload?.data || {} }), {
             status: response.status,
@@ -109,7 +113,7 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
         } catch {
           return Promise.reject(new Error("Invalid saved store data"));
         }
-        return nativeFetch("/api/back4app/sync", {
+        return nativeFetch(apiUrl("/back4app/sync"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ data }),
@@ -594,6 +598,8 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
 </script>
 <script>
   (() => {
+    const apiBase = String(window.__BOOKSTORE_API_BASE__ || "/api").replace(/\/$/, "");
+    const apiUrl = (path) => `${apiBase}${path}`;
     const excludedKeys = new Set([
       "bk_bin",
       "bk_key",
@@ -631,7 +637,7 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
 
       syncing = true;
       try {
-        const response = await fetch("/api/back4app/sync", {
+        const response = await fetch(apiUrl("/back4app/sync"), {
           method: "POST",
           keepalive,
           headers: { "Content-Type": "application/json" },
@@ -674,7 +680,7 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
       const payload = JSON.stringify({ data: readSavedData() });
       if (navigator.sendBeacon) {
         navigator.sendBeacon(
-          "/api/back4app/sync",
+          apiUrl("/back4app/sync"),
           new Blob([payload], { type: "application/json" }),
         );
       } else {
