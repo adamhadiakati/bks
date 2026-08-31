@@ -319,5 +319,70 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
     }
   })();
 </script>
+<script>
+  (() => {
+    if (window.location.protocol === "file:") return;
+
+    const previousFetch = window.fetch.bind(window);
+    let recoveryInProgress = false;
+
+    const recoverJsonbinConnection = async () => {
+      if (recoveryInProgress) return;
+      recoveryInProgress = true;
+
+      try {
+        const response = await previousFetch("/api/jsonbin/connect", {
+          method: "POST",
+          cache: "no-store",
+        });
+        const result = await response.json();
+        if (!response.ok || !result.accessCode) {
+          throw new Error(result.message || "JSONBin recovery failed.");
+        }
+
+        const decoded = JSON.parse(atob(result.accessCode));
+        localStorage.setItem("bk_bin", decoded.b);
+        localStorage.setItem("bk_key", decoded.k);
+        if (result.record) {
+          localStorage.setItem("bk_cache", JSON.stringify(result.record));
+        }
+        window.location.reload();
+      } catch {
+        recoveryInProgress = false;
+      }
+    };
+
+    window.fetch = async (input, init = {}) => {
+      const response = await previousFetch(input, init);
+      const url = typeof input === "string" ? input : input?.url || "";
+      const isJsonbinRead =
+        url.includes("api.jsonbin.io/v3/b/") &&
+        String(init.method || "GET").toUpperCase() === "GET";
+
+      if (
+        isJsonbinRead &&
+        [401, 403, 404].includes(response.status)
+      ) {
+        void recoverJsonbinConnection();
+      }
+      return response;
+    };
+
+    const bin = localStorage.getItem("bk_bin");
+    const key = localStorage.getItem("bk_key");
+    if (bin && key) {
+      previousFetch(`https://api.jsonbin.io/v3/b/${bin}/latest`, {
+        headers: { "X-Access-Key": key },
+        cache: "no-store",
+      }).then((response) => {
+        if ([401, 403, 404].includes(response.status)) {
+          void recoverJsonbinConnection();
+        }
+      }).catch(() => {
+        // The app's normal loading flow handles unavailable stores.
+      });
+    }
+  })();
+</script>
 <script src="https://replit-cdn.com/replit-pill/replit-pill.global.js" data-repl-id="91226334-64dd-42a4-8f21-0e7fb4e916da"></script></body>
 </html>
