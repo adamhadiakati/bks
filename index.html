@@ -242,12 +242,42 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
         button.textContent = "Connecting…";
       }
       try {
-        const response = await appFetch("/api/jsonbin/connect", {
+        const response = await appFetch(
+          `/api/jsonbin/connect?clientVersion=${encodeURIComponent(
+            document.documentElement.dataset.storefrontVersion || "current",
+          )}`,
+          {
           method: "POST",
-        });
-        const result = await response.json();
+            cache: "no-store",
+            headers: { Accept: "application/json" },
+          },
+        );
+
+        const contentType = response.headers.get("content-type") || "";
+        const bodyText = await response.text();
+        let result = {};
+
+        if (bodyText.trim()) {
+          try {
+            result = JSON.parse(bodyText);
+          } catch {
+            const compactBody = bodyText.replace(/\s+/g, " ").trim();
+            const isHtml =
+              /^<!doctype html/i.test(compactBody) ||
+              /^<html[\s>]/i.test(compactBody);
+            throw new Error(
+              isHtml
+                ? "The connection route returned a storefront page instead of JSON. Reload this page to replace the cached storefront, then try again."
+                : `The connection route returned invalid JSON${contentType ? ` (${contentType})` : ""}.`,
+            );
+          }
+        }
+
         if (!response.ok || !result.binId) {
-          throw new Error(result.message || "Could not connect to JSONBin.");
+          throw new Error(
+            result.message ||
+              `Could not connect to JSONBin (HTTP ${response.status}).`,
+          );
         }
 
         localStorage.setItem("bk_bin", result.binId);
@@ -331,7 +361,7 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
     window.fetch = async (input, init = {}) => {
       const url = typeof input === "string" ? input : input?.url || "";
       if (url.includes("api.jsonbin.io/v3/b/")) {
-        return previousFetch("/api/store", init);
+        return previousFetch("/api/store", { ...init, cache: "no-store" });
       }
       return previousFetch(input, init);
     };
