@@ -491,5 +491,72 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
     document.addEventListener("submit", handleCheckoutSubmit, true);
   })();
 </script>
+<script>
+  (() => {
+    const excludedKeys = new Set(["bk_bin", "bk_key"]);
+    const nativeSetItem = Storage.prototype.setItem;
+    const nativeRemoveItem = Storage.prototype.removeItem;
+    let syncTimer = 0;
+    let syncing = false;
+    let syncQueued = false;
+
+    const readSavedData = () => {
+      const data = {};
+      for (let index = 0; index < localStorage.length; index += 1) {
+        const key = localStorage.key(index);
+        if (!key || excludedKeys.has(key)) continue;
+        const value = localStorage.getItem(key);
+        try {
+          data[key] = value === null ? null : JSON.parse(value);
+        } catch {
+          data[key] = value;
+        }
+      }
+      return data;
+    };
+
+    const syncSavedData = async () => {
+      if (syncing) {
+        syncQueued = true;
+        return;
+      }
+
+      syncing = true;
+      try {
+        const response = await fetch("/api/jsonbin/sync", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: readSavedData() }),
+        });
+        if (!response.ok) throw new Error("Saved data sync failed");
+      } catch {
+        // Keep local saves working when the sync server is unavailable.
+      } finally {
+        syncing = false;
+        if (syncQueued) {
+          syncQueued = false;
+          scheduleSync();
+        }
+      }
+    };
+
+    const scheduleSync = () => {
+      window.clearTimeout(syncTimer);
+      syncTimer = window.setTimeout(syncSavedData, 400);
+    };
+
+    Storage.prototype.setItem = function (key, value) {
+      nativeSetItem.call(this, key, value);
+      if (this === localStorage && !excludedKeys.has(key)) scheduleSync();
+    };
+
+    Storage.prototype.removeItem = function (key) {
+      nativeRemoveItem.call(this, key);
+      if (this === localStorage && !excludedKeys.has(key)) scheduleSync();
+    };
+
+    scheduleSync();
+  })();
+</script>
 <script src="https://replit-cdn.com/replit-pill/replit-pill.global.js" data-repl-id="91226334-64dd-42a4-8f21-0e7fb4e916da"></script></body>
 </html>
