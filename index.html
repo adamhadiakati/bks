@@ -8,7 +8,7 @@
     <meta name="robots" content="index, follow" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.jsonbin.io https://goppay-backend.onrender.com; object-src 'none'; base-uri 'self';"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://goppay-backend.onrender.com; object-src 'none'; base-uri 'self';"
     />
     <meta property="og:title" content="Adam M.H. Akati — Books" />
     <meta property="og:description" content="Browse Adam M.H. Akati books and get instant digital delivery after checkout." />
@@ -31,7 +31,7 @@
 
     try {
       const request = new XMLHttpRequest();
-      request.open("GET", "/api/jsonbin/data", false);
+      request.open("GET", "/api/back4app/data", false);
       request.send();
       if (request.status >= 200 && request.status < 300) {
         const response = JSON.parse(request.responseText);
@@ -60,6 +60,10 @@
         nativeSetItem.call(localStorage, key, sessionValue);
       }
     });
+
+    // Remove legacy JSONBin access keys after switching the store backend.
+    localStorage.removeItem("bk_bin");
+    localStorage.removeItem("bk_key");
   })();
 </script>
 </head>
@@ -84,15 +88,37 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
     window.fetch = (input, init = {}) => {
       const url = typeof input === "string" ? input : input?.url || "";
       const method = String(init.method || "GET").toUpperCase();
-      if (method !== "PUT" || !url.includes("api.jsonbin.io")) {
+      if (!url.includes("api.jsonbin.io")) {
         return nativeFetch(input, init);
       }
 
-      const controller = new AbortController();
-      const timeout = window.setTimeout(() => controller.abort(), 8000);
-      return nativeFetch(input, { ...init, signal: controller.signal }).finally(() => {
-        window.clearTimeout(timeout);
-      });
+      if (method === "GET" && url.includes("/latest")) {
+        return nativeFetch("/api/back4app/data").then(async (response) => {
+          const payload = await response.json();
+          return new Response(JSON.stringify({ record: payload?.data || {} }), {
+            status: response.status,
+            headers: { "Content-Type": "application/json" },
+          });
+        });
+      }
+
+      if (method === "PUT" && typeof init.body === "string") {
+        let data = {};
+        try {
+          data = JSON.parse(init.body);
+        } catch {
+          return Promise.reject(new Error("Invalid saved store data"));
+        }
+        return nativeFetch("/api/back4app/sync", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data }),
+        });
+      }
+
+      return Promise.reject(
+        new Error("The legacy JSONBin connection flow is no longer available."),
+      );
     };
 
     const attachSaveFeedback = () => {
@@ -134,11 +160,23 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
       );
     };
 
-    new MutationObserver(attachSaveFeedback).observe(document.documentElement, {
+    const removeLegacyConnectionCard = () => {
+      const title = [...document.querySelectorAll(".admin-card-title")].find(
+        (element) => element.textContent?.trim() === "Share store access",
+      );
+      title?.closest(".admin-card")?.remove();
+    };
+
+    const updateAdminUi = () => {
+      attachSaveFeedback();
+      removeLegacyConnectionCard();
+    };
+
+    new MutationObserver(updateAdminUi).observe(document.documentElement, {
       childList: true,
       subtree: true,
     });
-    attachSaveFeedback();
+    updateAdminUi();
   })();
 </script>
 <script>
@@ -569,7 +607,7 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
 
       syncing = true;
       try {
-        const response = await fetch("/api/jsonbin/sync", {
+        const response = await fetch("/api/back4app/sync", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ data: readSavedData() }),
