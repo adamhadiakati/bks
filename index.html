@@ -113,6 +113,46 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
         return null;
       }
     };
+    const normalizePaymentSlug = (value) => {
+      let slug = String(value || "").trim();
+      if (!slug) return "";
+      try {
+        const parsed = new URL(slug);
+        slug = parsed.pathname;
+      } catch {
+        // The admin may enter the slug without a protocol or hostname.
+      }
+      slug = slug.replace(/^.*\/pay\//i, "");
+      try {
+        slug = decodeURIComponent(slug);
+      } catch {
+        // Keep the original value if it contains malformed escape sequences.
+      }
+      return slug.split(/[/?#]/)[0].trim();
+    };
+    const paymentSlugKey = (book) =>
+      `${String(book?.title || "").trim()}::${String(book?.author || "").trim()}`;
+    const setPaymentSlugOverride = (key, slug) => {
+      if (!key) return;
+      const overrides = readJson("bk_payment_slugs") || {};
+      overrides[key] = normalizePaymentSlug(slug);
+      localStorage.setItem("bk_payment_slugs", JSON.stringify(overrides));
+    };
+    const rememberPaymentSlug = (book, slug) => {
+      if (!book) return;
+      setPaymentSlugOverride(String(book.id || ""), slug);
+      setPaymentSlugOverride(paymentSlugKey(book), slug);
+    };
+    const getPaymentSlug = (book) => {
+      if (!book) return "";
+      const overrides = readJson("bk_payment_slugs") || {};
+      return (
+        normalizePaymentSlug(book.paystackSlug) ||
+        normalizePaymentSlug(overrides[String(book.id || "")]) ||
+        normalizePaymentSlug(overrides[paymentSlugKey(book)])
+      );
+    };
+    window.__bkGetPaymentSlug = getPaymentSlug;
 
     const findField = (container, labelText) =>
       [...container.querySelectorAll(".field")].find(
@@ -149,7 +189,10 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
                 (!pending.author || item.author === pending.author),
             ) || body.books?.find((item) => item.title === pending.title);
           if (book) {
-            book.paystackSlug = pending.slug;
+            const slug = normalizePaymentSlug(pending.slug);
+            book.paystackSlug = slug;
+            rememberPaymentSlug(book, slug);
+            localStorage.setItem("bk_cache", JSON.stringify(body));
             init = { ...init, body: JSON.stringify(body) };
           }
         } catch {
@@ -172,8 +215,13 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
       window.__pendingBookPayment = {
         title: titleInput.value.trim(),
         author: authorInput?.value.trim() || "",
-        slug: slugInput.value.trim(),
+        slug: normalizePaymentSlug(slugInput.value),
       };
+      slugInput.value = window.__pendingBookPayment.slug;
+      setPaymentSlugOverride(
+        `${window.__pendingBookPayment.title}::${window.__pendingBookPayment.author}`,
+        window.__pendingBookPayment.slug,
+      );
 
       window.setTimeout(() => {
         const data = readJson("bk_cache");
@@ -188,7 +236,8 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
           ) || data.books.find((item) => item.title === pending.title);
         if (!book) return;
 
-        book.paystackSlug = pending.slug;
+        book.paystackSlug = normalizePaymentSlug(pending.slug);
+        rememberPaymentSlug(book, book.paystackSlug);
         localStorage.setItem("bk_cache", JSON.stringify(data));
       }, 0);
     };
@@ -225,8 +274,8 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
               item.title === title &&
               (!author || item.author === author),
           ) || data?.books?.find((item) => item.title === title);
-        if (slugInput && existing?.paystackSlug) {
-          slugInput.value = existing.paystackSlug;
+        if (slugInput && existing) {
+          slugInput.value = getPaymentSlug(existing);
         }
       }
 
@@ -258,7 +307,7 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
         const cart = readJson("bk_cart") || [];
         const slug = cart
           .map((line) => data?.books?.find((book) => book.id === line.bookId))
-          .map((book) => book?.paystackSlug?.trim())
+          .map((book) => getPaymentSlug(book))
           .find(Boolean);
         if (slug) {
           const parsed = new URL(url, window.location.href);
@@ -318,6 +367,12 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
         }))
         .filter(({ line, book }) => book && Number(line.qty) > 0);
     };
+    const getPaymentSlug = (book) => {
+      if (typeof window.__bkGetPaymentSlug === "function") {
+        return window.__bkGetPaymentSlug(book);
+      }
+      return String(book?.paystackSlug || "").trim();
+    };
 
     // The original cart keeps quantity 1 when the minus button is clicked.
     // Let its existing remove handler handle the last-item case instead.
@@ -355,9 +410,16 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
         book,
         qty: Math.max(1, Number(line.qty) || 1),
       }));
-      const slug =
-        lines.map(({ book }) => String(book.paystackSlug || "").trim()).find(Boolean) ||
-        String(catalog.store?.paystackSlug || "").trim();
+      const bookSlugs = [
+        ...new Set(lines.map(({ book }) => getPaymentSlug(book)).filter(Boolean)),
+      ];
+      if (bookSlugs.length > 1) {
+        window.alert(
+          "These books use different payment pages. Please check out one book at a time.",
+        );
+        return;
+      }
+      const slug = bookSlugs[0] || getPaymentSlug(catalog.store);
 
       // Preserve the app's own validation if there is no configured page at all.
       if (!slug) return;
