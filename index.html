@@ -161,10 +161,34 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
     };
 
     const removeLegacyConnectionCard = () => {
-      const title = [...document.querySelectorAll(".admin-card-title")].find(
-        (element) => element.textContent?.trim() === "Share store access",
-      );
-      title?.closest(".admin-card")?.remove();
+      [...document.querySelectorAll(".admin-card")].forEach((card) => {
+        const text = card.textContent || "";
+        if (
+          text.includes("Share store access") ||
+          text.includes("JSONBin") ||
+          text.includes("JSONBin.io")
+        ) {
+          card.remove();
+        }
+      });
+
+      [...document.querySelectorAll(".alert")].forEach((alert) => {
+        if (
+          (alert.textContent || "").includes("Local mode is active") ||
+          (alert.textContent || "").includes("JSONBin")
+        ) {
+          alert.remove();
+        }
+      });
+
+      [...document.querySelectorAll(".admin-nav-button")].forEach((button) => {
+        if (
+          (button.textContent || "").trim() === "Access code" ||
+          button.getAttribute("data-testid") === "button-admin-access"
+        ) {
+          button.remove();
+        }
+      });
     };
 
     const updateAdminUi = () => {
@@ -599,7 +623,7 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
       return data;
     };
 
-    const syncSavedData = async () => {
+    const syncSavedData = async (keepalive = false) => {
       if (syncing) {
         syncQueued = true;
         return;
@@ -609,6 +633,7 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
       try {
         const response = await fetch("/api/back4app/sync", {
           method: "POST",
+          keepalive,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ data: readSavedData() }),
         });
@@ -644,6 +669,18 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
       }
       if (this === localStorage && !excludedKeys.has(key)) scheduleSync();
     };
+
+    window.addEventListener("pagehide", () => {
+      const payload = JSON.stringify({ data: readSavedData() });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(
+          "/api/back4app/sync",
+          new Blob([payload], { type: "application/json" }),
+        );
+      } else {
+        void syncSavedData(true);
+      }
+    });
 
     scheduleSync();
   })();
