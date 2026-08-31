@@ -16,6 +16,30 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Adam M.H. Akati — Books" />
     <meta name="twitter:description" content="Browse Adam M.H. Akati books and get instant digital delivery after checkout." />
+    <script>
+      (() => {
+        if (window.location.protocol === "file:") return;
+
+        const nativeFetch = window.fetch.bind(window);
+        window.fetch = (input, init = {}) => {
+          const url = typeof input === "string" ? input : input?.url || "";
+          if (!url.includes("api.jsonbin.io/v3/b/")) {
+            return nativeFetch(input, init);
+          }
+
+          const headers = new Headers(init.headers || {});
+          headers.delete("X-Access-Key");
+          headers.delete("X-Master-Key");
+          headers.set("Accept", "application/json");
+
+          return nativeFetch("/api/store", {
+            ...init,
+            headers,
+            cache: "no-store",
+          });
+        };
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -317,6 +341,20 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
       form.insertAdjacentElement("afterend", button);
     };
 
+    const removeStoreSettingsPaymentSection = () => {
+      const heading = [...document.querySelectorAll(".eyebrow")].find(
+        (item) => item.textContent?.trim() === "Paystack checkout",
+      );
+      const section = heading?.parentElement;
+      if (
+        section &&
+        section.textContent?.includes("Payment page slug") &&
+        section.textContent?.includes("Verify server URL")
+      ) {
+        section.remove();
+      }
+    };
+
     const nativeOpen = window.open.bind(window);
     window.open = (url, target, features, replace) => {
       let nextUrl = url;
@@ -339,10 +377,12 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
     const observer = new MutationObserver(() => {
       attachBookPaymentField();
       attachJsonbinButton();
+      removeStoreSettingsPaymentSection();
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
     attachBookPaymentField();
     attachJsonbinButton();
+    removeStoreSettingsPaymentSection();
 
     if (
       window.location.protocol !== "file:" &&
