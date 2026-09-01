@@ -42,6 +42,13 @@
       request.setRequestHeader("X-Parse-Application-Id", back4appAppId);
       request.setRequestHeader("X-Parse-REST-API-Key", back4appRestKey);
       request.send();
+      if (request.status < 200 || request.status >= 300) {
+        console.error(
+          "[back4app] load failed:",
+          request.status,
+          request.responseText,
+        );
+      }
       if (request.status >= 200 && request.status < 300) {
         const response = JSON.parse(request.responseText);
         const record = response?.results?.[0];
@@ -187,10 +194,11 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
         }
       });
 
-      [...document.querySelectorAll(".alert")].forEach((alert) => {
+      [...document.querySelectorAll(".alert, .notice")].forEach((alert) => {
         if (
           (alert.textContent || "").includes("Local mode is active") ||
-          (alert.textContent || "").includes("JSONBin")
+          (alert.textContent || "").includes("JSONBin") ||
+          (alert.textContent || "").includes("not been connected")
         ) {
           alert.remove();
         }
@@ -202,6 +210,12 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
           button.getAttribute("data-testid") === "button-admin-access"
         ) {
           button.remove();
+        }
+      });
+
+      [...document.querySelectorAll(".text-link")].forEach((link) => {
+        if ((link.textContent || "").trim() === "Connect or set up live database") {
+          link.remove();
         }
       });
     };
@@ -664,7 +678,14 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
           },
           body: JSON.stringify({ state: readSavedData() }),
         });
-        if (!response.ok) throw new Error("Saved data sync failed");
+        if (!response.ok) {
+          console.error(
+            "[back4app] sync failed:",
+            response.status,
+            await response.text().catch(() => ""),
+          );
+          throw new Error("Saved data sync failed");
+        }
         if (!objectId) {
           const created = await response.json();
           if (created?.objectId) {
