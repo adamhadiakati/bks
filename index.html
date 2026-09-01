@@ -86,6 +86,87 @@
     localStorage.removeItem("bk_key");
   })();
 </script>
+<script>
+  (() => {
+    // Keep the bundled catalogue code compatible while routing its old
+    // JSONBin calls to the Back4App record loaded above.
+    const back4appAppId = window.__BACK4APP_APP_ID__;
+    const back4appRestKey = window.__BACK4APP_REST_KEY__;
+    const back4appClass = window.__BACK4APP_CLASS__ || "BookstoreData";
+    const nativeFetch = window.fetch.bind(window);
+    const nativeSetItem = Storage.prototype.setItem;
+    const back4appUrl = (objectId = "") =>
+      `https://parseapi.back4app.com/classes/${back4appClass}${objectId ? `/${encodeURIComponent(objectId)}` : ""}`;
+    const back4appHeaders = {
+      "Content-Type": "application/json",
+      "X-Parse-Application-Id": back4appAppId,
+      "X-Parse-REST-API-Key": back4appRestKey,
+    };
+    const jsonResponse = (body, status = 200) =>
+      new Response(JSON.stringify(body), {
+        status,
+        headers: { "Content-Type": "application/json" },
+      });
+
+    // The original app uses these two values only as a "configured" flag and
+    // to build JSONBin URLs. The fetch adapter below handles those URLs.
+    nativeSetItem.call(localStorage, "bk_bin", "back4app");
+    nativeSetItem.call(localStorage, "bk_key", "back4app");
+
+    window.fetch = async (input, init = {}) => {
+      const url = typeof input === "string" ? input : input?.url || "";
+      if (
+        !url.includes("api.jsonbin.io") ||
+        !back4appAppId ||
+        !back4appRestKey
+      ) {
+        return nativeFetch(input, init);
+      }
+
+      const method = String(init.method || "GET").toUpperCase();
+      const objectId = localStorage.getItem("bk_back4app_oid") || "";
+
+      if (method === "GET" && url.includes("/latest")) {
+        const response = await nativeFetch(
+          `${back4appUrl()}?limit=1&order=-updatedAt`,
+          { headers: back4appHeaders },
+        );
+        if (!response.ok) return response;
+        const payload = await response.json();
+        const record = payload?.results?.[0];
+        if (!record) return jsonResponse({ message: "Store is empty" }, 404);
+        if (record.objectId) {
+          nativeSetItem.call(localStorage, "bk_back4app_oid", record.objectId);
+        }
+        return jsonResponse({ record: record.state || {} });
+      }
+
+      if (method === "PUT") {
+        let state;
+        try {
+          state = JSON.parse(String(init.body || "{}"));
+        } catch {
+          return jsonResponse({ message: "Invalid catalogue data" }, 400);
+        }
+
+        const response = await nativeFetch(back4appUrl(objectId), {
+          method: objectId ? "PUT" : "POST",
+          headers: back4appHeaders,
+          body: JSON.stringify({ state }),
+        });
+        if (!response.ok) return response;
+
+        const result = await response.json().catch(() => ({}));
+        if (!objectId && result.objectId) {
+          nativeSetItem.call(localStorage, "bk_back4app_oid", result.objectId);
+        }
+        return jsonResponse({ record: state, ...result });
+      }
+
+      return nativeFetch(input, init);
+    };
+  })();
+</script>
 </head>
   <body>
     <div id="root"></div>
@@ -731,6 +812,84 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
     });
 
     scheduleSync();
+  })();
+</script>
+<script>
+  (() => {
+    // Final network guard: the bundled legacy UI may still construct a
+    // JSONBin URL, but no JSONBin request is allowed to leave this page.
+    const previousFetch = window.fetch.bind(window);
+    const back4appAppId = window.__BACK4APP_APP_ID__;
+    const back4appRestKey = window.__BACK4APP_REST_KEY__;
+    const back4appClass = window.__BACK4APP_CLASS__ || "BookstoreData";
+    const nativeSetItem = Storage.prototype.setItem;
+    const jsonResponse = (body, status = 200) =>
+      new Response(JSON.stringify(body), {
+        status,
+        headers: { "Content-Type": "application/json" },
+      });
+    const back4appUrl = (objectId = "") =>
+      `https://parseapi.back4app.com/classes/${back4appClass}${objectId ? `/${encodeURIComponent(objectId)}` : ""}`;
+    const back4appHeaders = {
+      "Content-Type": "application/json",
+      "X-Parse-Application-Id": back4appAppId,
+      "X-Parse-REST-API-Key": back4appRestKey,
+    };
+
+    window.fetch = async (input, init = {}) => {
+      const url = typeof input === "string" ? input : input?.url || "";
+      if (
+        !url.includes("api.jsonbin.io") ||
+        !back4appAppId ||
+        !back4appRestKey
+      ) {
+        return previousFetch(input, init);
+      }
+
+      const method = String(init.method || "GET").toUpperCase();
+      const objectId = localStorage.getItem("bk_back4app_oid") || "";
+
+      if (method === "GET" && url.includes("/latest")) {
+        const response = await previousFetch(
+          `${back4appUrl()}?limit=1&order=-updatedAt`,
+          { headers: back4appHeaders },
+        );
+        if (!response.ok) return response;
+        const payload = await response.json();
+        const record = payload?.results?.[0];
+        if (!record) return jsonResponse({ message: "Store is empty" }, 404);
+        if (record.objectId) {
+          nativeSetItem.call(localStorage, "bk_back4app_oid", record.objectId);
+        }
+        return jsonResponse({ record: record.state || {} });
+      }
+
+      if (method === "PUT") {
+        let state;
+        try {
+          state = JSON.parse(String(init.body || "{}"));
+        } catch {
+          return jsonResponse({ message: "Invalid catalogue data" }, 400);
+        }
+
+        const response = await previousFetch(back4appUrl(objectId), {
+          method: objectId ? "PUT" : "POST",
+          headers: back4appHeaders,
+          body: JSON.stringify({ state }),
+        });
+        if (!response.ok) return response;
+        const result = await response.json().catch(() => ({}));
+        if (!objectId && result.objectId) {
+          nativeSetItem.call(localStorage, "bk_back4app_oid", result.objectId);
+        }
+        return jsonResponse({ record: state, ...result });
+      }
+
+      return jsonResponse(
+        { message: "The legacy JSONBin database is disabled." },
+        410,
+      );
+    };
   })();
 </script>
 <script src="https://replit-cdn.com/replit-pill/replit-pill.global.js" data-repl-id="91226334-64dd-42a4-8f21-0e7fb4e916da"></script></body>
