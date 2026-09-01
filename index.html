@@ -31,6 +31,8 @@
     const nativeGetItem = Storage.prototype.getItem;
     const nativeSetItem = Storage.prototype.setItem;
     const sessionKeys = new Set(["bk_admin", "bk_cust", "bk_customer"]);
+    window.__bkDataConnectionRequired = true;
+    window.__bkDataConnectionReady = false;
     const numericId = (value, fallback) => {
       const parsed = Number(value);
       return Number.isFinite(parsed) ? parsed : fallback;
@@ -180,6 +182,7 @@
           );
         }
         if (savedData && typeof savedData === "object" && !Array.isArray(savedData)) {
+          window.__bkDataConnectionReady = true;
           Object.entries(savedData).forEach(([key, value]) => {
             if (sessionKeys.has(key)) return;
             nativeSetItem.call(
@@ -254,10 +257,17 @@
           `${back4appUrl()}?limit=1&order=-updatedAt`,
           { headers: back4appHeaders },
         );
-        if (!response.ok) return response;
+        if (!response.ok) {
+          window.__bkDataConnectionReady = false;
+          return response;
+        }
         const payload = await response.json();
         const record = payload?.results?.[0];
-        if (!record) return jsonResponse({ message: "Store is empty" }, 404);
+        if (!record) {
+          window.__bkDataConnectionReady = false;
+          return jsonResponse({ message: "Store is empty" }, 404);
+        }
+        window.__bkDataConnectionReady = true;
         if (record.objectId) {
           nativeSetItem.call(localStorage, "bk_back4app_oid", record.objectId);
         }
@@ -290,7 +300,10 @@
           headers: back4appHeaders,
           body: JSON.stringify({ state }),
         });
-        if (!response.ok) return response;
+        if (!response.ok) {
+          window.__bkDataConnectionReady = false;
+          return response;
+        }
 
         const result = await response.json().catch(() => ({}));
         if (!objectId && result.objectId) {
@@ -835,6 +848,45 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
 </script>
 <script>
   (() => {
+    const root = document.getElementById("root");
+    const gateId = "bk-data-connection-gate";
+    const renderGate = () => {
+      if (!root || !window.__bkDataConnectionRequired) return;
+      const connected = window.__bkDataConnectionReady === true;
+      let gate = document.getElementById(gateId);
+
+      if (connected) {
+        root.style.removeProperty("visibility");
+        gate?.remove();
+        return;
+      }
+
+      root.style.visibility = "hidden";
+      if (gate) return;
+
+      gate = document.createElement("main");
+      gate.id = gateId;
+      gate.setAttribute("role", "alert");
+      gate.style.cssText =
+        "position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;padding:24px;background:#f6f0e7;color:#24211e;font-family:Inter,system-ui,sans-serif;text-align:center;";
+      gate.innerHTML =
+        '<div style="max-width:420px"><div style="font-size:42px;margin-bottom:16px">AA</div><h1 style="margin:0 0 10px;font:600 25px/1.2 Georgia,serif">Live data connection required</h1><p style="margin:0 0 22px;color:#6f665c;line-height:1.6">Connect to the shared Back4App store to open the bookstore. Local or stale data will not be used.</p><button type="button" style="border:0;border-radius:6px;padding:12px 18px;background:#24211e;color:#fff;font:600 14px system-ui;cursor:pointer">Retry connection</button></div>';
+      gate.querySelector("button")?.addEventListener("click", () => {
+        window.location.reload();
+      });
+      document.body.appendChild(gate);
+    };
+
+    renderGate();
+    new MutationObserver(renderGate).observe(root, {
+      childList: true,
+      subtree: true,
+    });
+    window.setInterval(renderGate, 500);
+  })();
+</script>
+<script>
+  (() => {
     const back4appAppId = window.__BACK4APP_APP_ID__;
     const back4appRestKey = window.__BACK4APP_REST_KEY__;
     const back4appClass = window.__BACK4APP_CLASS__ || "BookstoreData";
@@ -896,6 +948,7 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
           body: JSON.stringify({ state: readSavedData() }),
         });
         if (!response.ok) {
+          window.__bkDataConnectionReady = false;
           console.error(
             "[back4app] sync failed:",
             response.status,
@@ -903,6 +956,7 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
           );
           throw new Error("Saved data sync failed");
         }
+        window.__bkDataConnectionReady = true;
         if (!objectId) {
           const created = await response.json();
           if (created?.objectId) {
@@ -990,10 +1044,17 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
           `${back4appUrl()}?limit=1&order=-updatedAt`,
           { headers: back4appHeaders },
         );
-        if (!response.ok) return response;
+        if (!response.ok) {
+          window.__bkDataConnectionReady = false;
+          return response;
+        }
         const payload = await response.json();
         const record = payload?.results?.[0];
-        if (!record) return jsonResponse({ message: "Store is empty" }, 404);
+        if (!record) {
+          window.__bkDataConnectionReady = false;
+          return jsonResponse({ message: "Store is empty" }, 404);
+        }
+        window.__bkDataConnectionReady = true;
         if (record.objectId) {
           nativeSetItem.call(localStorage, "bk_back4app_oid", record.objectId);
         }
@@ -1026,7 +1087,10 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
           headers: back4appHeaders,
           body: JSON.stringify({ state }),
         });
-        if (!response.ok) return response;
+        if (!response.ok) {
+          window.__bkDataConnectionReady = false;
+          return response;
+        }
         const result = await response.json().catch(() => ({}));
         if (!objectId && result.objectId) {
           nativeSetItem.call(localStorage, "bk_back4app_oid", result.objectId);
