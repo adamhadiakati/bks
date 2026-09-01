@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head><script>window.__BOOKSTORE_API_BASE__="https://6a1b210f-35ab-4ae1-817e-c2bed39c718c-00-2nlo2n6q2sqa8.worf.replit.dev/api";</script>
+  <head><script>window.__BACK4APP_APP_ID__="52157b26-0b5b-478f-af79-016f93916b82";window.__BACK4APP_REST_KEY__="zbntWD9nDxmBCqGnlkhvSikqRRzcwUZoqedMgRiB";window.__BACK4APP_CLASS__="BookstoreData";</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
     <title>Adam M.H. Akati — Books</title>
@@ -8,7 +8,7 @@
     <meta name="robots" content="index, follow" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://goppay-backend.onrender.com; object-src 'none'; base-uri 'self';"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://goppay-backend.onrender.com https://parseapi.back4app.com; object-src 'none'; base-uri 'self';"
     />
     <meta property="og:title" content="Adam M.H. Akati — Books" />
     <meta property="og:description" content="Browse Adam M.H. Akati books and get instant digital delivery after checkout." />
@@ -25,19 +25,30 @@
 </style>
 <script>
   (() => {
-    const apiBase = String(window.__BOOKSTORE_API_BASE__ || "/api").replace(/\/$/, "");
-    const apiUrl = (path) => `${apiBase}${path}`;
+    const back4appAppId = window.__BACK4APP_APP_ID__;
+    const back4appRestKey = window.__BACK4APP_REST_KEY__;
+    const back4appClass = window.__BACK4APP_CLASS__ || "BookstoreData";
     const nativeGetItem = Storage.prototype.getItem;
     const nativeSetItem = Storage.prototype.setItem;
     const sessionKeys = new Set(["bk_admin", "bk_cust", "bk_customer"]);
 
     try {
       const request = new XMLHttpRequest();
-      request.open("GET", apiUrl("/back4app/data"), false);
+      request.open(
+        "GET",
+        `https://parseapi.back4app.com/classes/${back4appClass}?limit=1&order=-updatedAt`,
+        false,
+      );
+      request.setRequestHeader("X-Parse-Application-Id", back4appAppId);
+      request.setRequestHeader("X-Parse-REST-API-Key", back4appRestKey);
       request.send();
       if (request.status >= 200 && request.status < 300) {
         const response = JSON.parse(request.responseText);
-        const savedData = response?.data;
+        const record = response?.results?.[0];
+        const savedData = record?.state;
+        if (record?.objectId) {
+          nativeSetItem.call(localStorage, "bk_back4app_oid", record.objectId);
+        }
         if (savedData && typeof savedData === "object" && !Array.isArray(savedData)) {
           Object.entries(savedData).forEach(([key, value]) => {
             if (sessionKeys.has(key)) return;
@@ -598,14 +609,16 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
 </script>
 <script>
   (() => {
-    const apiBase = String(window.__BOOKSTORE_API_BASE__ || "/api").replace(/\/$/, "");
-    const apiUrl = (path) => `${apiBase}${path}`;
+    const back4appAppId = window.__BACK4APP_APP_ID__;
+    const back4appRestKey = window.__BACK4APP_REST_KEY__;
+    const back4appClass = window.__BACK4APP_CLASS__ || "BookstoreData";
     const excludedKeys = new Set([
       "bk_bin",
       "bk_key",
       "bk_admin",
       "bk_cust",
       "bk_customer",
+      "bk_back4app_oid",
     ]);
     const sessionKeys = new Set(["bk_admin", "bk_cust", "bk_customer"]);
     const nativeSetItem = Storage.prototype.setItem;
@@ -637,13 +650,27 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
 
       syncing = true;
       try {
-        const response = await fetch(apiUrl("/back4app/sync"), {
-          method: "POST",
+        const objectId = localStorage.getItem("bk_back4app_oid");
+        const url = objectId
+          ? `https://parseapi.back4app.com/classes/${back4appClass}/${objectId}`
+          : `https://parseapi.back4app.com/classes/${back4appClass}`;
+        const response = await fetch(url, {
+          method: objectId ? "PUT" : "POST",
           keepalive,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ data: readSavedData() }),
+          headers: {
+            "Content-Type": "application/json",
+            "X-Parse-Application-Id": back4appAppId,
+            "X-Parse-REST-API-Key": back4appRestKey,
+          },
+          body: JSON.stringify({ state: readSavedData() }),
         });
         if (!response.ok) throw new Error("Saved data sync failed");
+        if (!objectId) {
+          const created = await response.json();
+          if (created?.objectId) {
+            nativeSetItem.call(localStorage, "bk_back4app_oid", created.objectId);
+          }
+        }
       } catch {
         // Keep local saves working when the sync server is unavailable.
       } finally {
@@ -677,15 +704,9 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
     };
 
     window.addEventListener("pagehide", () => {
-      const payload = JSON.stringify({ data: readSavedData() });
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon(
-          apiUrl("/back4app/sync"),
-          new Blob([payload], { type: "application/json" }),
-        );
-      } else {
-        void syncSavedData(true);
-      }
+      // sendBeacon can't carry the custom Back4App auth headers, so use a
+      // keepalive fetch instead (supported by all current browsers on unload).
+      void syncSavedData(true);
     });
 
     scheduleSync();
