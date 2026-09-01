@@ -31,6 +31,122 @@
     const nativeGetItem = Storage.prototype.getItem;
     const nativeSetItem = Storage.prototype.setItem;
     const sessionKeys = new Set(["bk_admin", "bk_cust", "bk_customer"]);
+    const numericId = (value, fallback) => {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : fallback;
+    };
+    const normalizeDatabase = (value) => {
+      if (!value || typeof value !== "object" || Array.isArray(value)) {
+        return value;
+      }
+
+      const customers = Array.isArray(value.customers)
+        ? value.customers.map((customer, index) => ({
+            ...customer,
+            id: numericId(customer?.id, index + 1),
+          }))
+        : [];
+      const orders = Array.isArray(value.orders)
+        ? value.orders.map((order, index) => {
+            const buyer =
+              order?.buyer && typeof order.buyer === "object"
+                ? order.buyer
+                : {};
+            const items = Array.isArray(order?.items)
+              ? order.items.map((item) => ({
+                  ...item,
+                  title: String(item?.title || "Book"),
+                  qty: Math.max(1, numericId(item?.qty, 1)),
+                  price: numericId(item?.price, 0),
+                }))
+              : [];
+            const status = ["pending", "paid", "completed", "cancelled"].includes(
+              order?.status,
+            )
+              ? order.status
+              : "paid";
+            return {
+              ...order,
+              id: numericId(order?.id, index + 1),
+              orderNo: String(order?.orderNo || `ORD-${index + 1}`),
+              date:
+                typeof order?.date === "string" && order.date
+                  ? order.date
+                  : typeof order?.createdAt === "string" && order.createdAt
+                    ? order.createdAt
+                    : new Date().toISOString(),
+              customerId:
+                order?.customerId == null
+                  ? null
+                  : numericId(order.customerId, order.customerId),
+              buyer: {
+                name: String(buyer.name || "Unknown buyer"),
+                email: String(buyer.email || ""),
+                phone: String(buyer.phone || ""),
+              },
+              items,
+              total: numericId(order?.total, 0),
+              paymentMethod: String(order?.paymentMethod || "Paystack"),
+              status,
+            };
+          })
+        : [];
+
+      return { ...value, customers, orders };
+    };
+    const normalizeSavedData = (value) => {
+      if (!value || typeof value !== "object" || Array.isArray(value)) {
+        return value;
+      }
+      const normalized = { ...value };
+      const legacyDatabaseKeys = [
+        "store",
+        "users",
+        "customers",
+        "books",
+        "orders",
+        "nextBid",
+        "nextOid",
+        "nextCid",
+        "nextUid",
+      ];
+      const database =
+        normalized.bk_cache &&
+        typeof normalized.bk_cache === "object" &&
+        !Array.isArray(normalized.bk_cache)
+          ? { ...normalized.bk_cache }
+          : {};
+      legacyDatabaseKeys.forEach((key) => {
+        const nestedValue = database[key];
+        const legacyValue = normalized[key];
+        const nestedIsEmptyArray =
+          Array.isArray(nestedValue) &&
+          nestedValue.length === 0 &&
+          Array.isArray(legacyValue) &&
+          legacyValue.length > 0;
+        if (nestedValue === undefined || nestedIsEmptyArray) {
+          if (legacyValue !== undefined) database[key] = legacyValue;
+        }
+      });
+      normalized.bk_cache = normalizeDatabase(database);
+      return normalized;
+    };
+    window.__bkNormalizeDatabase = normalizeDatabase;
+    window.__bkNormalizeSavedData = normalizeSavedData;
+    try {
+      const localCache = nativeGetItem.call(localStorage, "bk_cache");
+      if (localCache) {
+        const parsedCache = JSON.parse(localCache);
+        const normalizedCache = normalizeDatabase(parsedCache);
+        nativeSetItem.call(
+          localStorage,
+          "bk_cache",
+          JSON.stringify(normalizedCache),
+        );
+      }
+    } catch {
+      // The app will fall back to its default catalogue if local data is invalid.
+    }
 
     try {
       const request = new XMLHttpRequest();
@@ -52,9 +168,16 @@
       if (request.status >= 200 && request.status < 300) {
         const response = JSON.parse(request.responseText);
         const record = response?.results?.[0];
-        const savedData = record?.state;
+        const savedData = normalizeSavedData(record?.state);
         if (record?.objectId) {
           nativeSetItem.call(localStorage, "bk_back4app_oid", record.objectId);
+        }
+        if (record?.updatedAt) {
+          nativeSetItem.call(
+            localStorage,
+            "bk_back4app_updated_at",
+            record.updatedAt,
+          );
         }
         if (savedData && typeof savedData === "object" && !Array.isArray(savedData)) {
           Object.entries(savedData).forEach(([key, value]) => {
@@ -138,7 +261,17 @@
         if (record.objectId) {
           nativeSetItem.call(localStorage, "bk_back4app_oid", record.objectId);
         }
-        return jsonResponse({ record: record.state || {} });
+        if (record.updatedAt) {
+          nativeSetItem.call(
+            localStorage,
+            "bk_back4app_updated_at",
+            record.updatedAt,
+          );
+        }
+        const savedData = window.__bkNormalizeSavedData
+          ? window.__bkNormalizeSavedData(record.state || {})
+          : record.state || {};
+        return jsonResponse({ record: savedData });
       }
 
       if (method === "PUT") {
@@ -147,6 +280,9 @@
           state = JSON.parse(String(init.body || "{}"));
         } catch {
           return jsonResponse({ message: "Invalid catalogue data" }, 400);
+        }
+        if (window.__bkNormalizeDatabase) {
+          state = window.__bkNormalizeDatabase(state);
         }
 
         const response = await nativeFetch(back4appUrl(objectId), {
@@ -159,6 +295,13 @@
         const result = await response.json().catch(() => ({}));
         if (!objectId && result.objectId) {
           nativeSetItem.call(localStorage, "bk_back4app_oid", result.objectId);
+        }
+        if (result.updatedAt) {
+          nativeSetItem.call(
+            localStorage,
+            "bk_back4app_updated_at",
+            result.updatedAt,
+          );
         }
         return jsonResponse({ record: state, ...result });
       }
@@ -184,8 +327,6 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
 <script>
   (() => {
     const selector = '[data-testid="button-save-settings"]';
-    const apiBase = String(window.__BOOKSTORE_API_BASE__ || "/api").replace(/\/$/, "");
-    const apiUrl = (path) => `${apiBase}${path}`;
     const nativeFetch = window.fetch.bind(window);
 
     window.fetch = (input, init = {}) => {
@@ -196,13 +337,7 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
       }
 
       if (method === "GET" && url.includes("/latest")) {
-        return nativeFetch(apiUrl("/back4app/data")).then(async (response) => {
-          const payload = await response.json();
-          return new Response(JSON.stringify({ record: payload?.data || {} }), {
-            status: response.status,
-            headers: { "Content-Type": "application/json" },
-          });
-        });
+        return nativeFetch(input, init);
       }
 
       if (method === "PUT" && typeof init.body === "string") {
@@ -212,11 +347,7 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
         } catch {
           return Promise.reject(new Error("Invalid saved store data"));
         }
-        return nativeFetch(apiUrl("/back4app/sync"), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ data }),
-        });
+        return nativeFetch(input, { ...init, body: JSON.stringify(data) });
       }
 
       return Promise.reject(
@@ -714,6 +845,7 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
       "bk_cust",
       "bk_customer",
       "bk_back4app_oid",
+      "bk_back4app_updated_at",
     ]);
     const sessionKeys = new Set(["bk_admin", "bk_cust", "bk_customer"]);
     const nativeSetItem = Storage.prototype.setItem;
@@ -729,7 +861,11 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
         if (!key || excludedKeys.has(key)) continue;
         const value = localStorage.getItem(key);
         try {
-          data[key] = value === null ? null : JSON.parse(value);
+          const parsed = value === null ? null : JSON.parse(value);
+          data[key] =
+            key === "bk_cache" && window.__bkNormalizeDatabase
+              ? window.__bkNormalizeDatabase(parsed)
+              : parsed;
         } catch {
           data[key] = value;
         }
@@ -861,7 +997,17 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
         if (record.objectId) {
           nativeSetItem.call(localStorage, "bk_back4app_oid", record.objectId);
         }
-        return jsonResponse({ record: record.state || {} });
+        if (record.updatedAt) {
+          nativeSetItem.call(
+            localStorage,
+            "bk_back4app_updated_at",
+            record.updatedAt,
+          );
+        }
+        const savedData = window.__bkNormalizeSavedData
+          ? window.__bkNormalizeSavedData(record.state || {})
+          : record.state || {};
+        return jsonResponse({ record: savedData });
       }
 
       if (method === "PUT") {
@@ -870,6 +1016,9 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
           state = JSON.parse(String(init.body || "{}"));
         } catch {
           return jsonResponse({ message: "Invalid catalogue data" }, 400);
+        }
+        if (window.__bkNormalizeDatabase) {
+          state = window.__bkNormalizeDatabase(state);
         }
 
         const response = await previousFetch(back4appUrl(objectId), {
@@ -882,6 +1031,13 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
         if (!objectId && result.objectId) {
           nativeSetItem.call(localStorage, "bk_back4app_oid", result.objectId);
         }
+        if (result.updatedAt) {
+          nativeSetItem.call(
+            localStorage,
+            "bk_back4app_updated_at",
+            result.updatedAt,
+          );
+        }
         return jsonResponse({ record: state, ...result });
       }
 
@@ -890,6 +1046,84 @@ ${o}`],{type:"text/plain"}),T=document.createElement("a");T.href=URL.createObjec
         410,
       );
     };
+  })();
+</script>
+<script>
+  (() => {
+    const back4appAppId = window.__BACK4APP_APP_ID__;
+    const back4appRestKey = window.__BACK4APP_REST_KEY__;
+    const back4appClass = window.__BACK4APP_CLASS__ || "BookstoreData";
+    const nativeSetItem = Storage.prototype.setItem;
+    const sessionKeys = new Set(["bk_admin", "bk_cust", "bk_customer"]);
+    let refreshInFlight = false;
+
+    const refreshAdminData = async () => {
+      if (
+        refreshInFlight ||
+        !sessionStorage.getItem("bk_admin") ||
+        document.hidden ||
+        !back4appAppId ||
+        !back4appRestKey
+      ) {
+        return;
+      }
+
+      refreshInFlight = true;
+      try {
+        const response = await window.fetch(
+          `https://parseapi.back4app.com/classes/${back4appClass}?limit=1&order=-updatedAt`,
+          {
+            headers: {
+              "X-Parse-Application-Id": back4appAppId,
+              "X-Parse-REST-API-Key": back4appRestKey,
+            },
+          },
+        );
+        if (!response.ok) return;
+
+        const record = (await response.json())?.results?.[0];
+        if (!record?.state || typeof record.state !== "object") return;
+
+        const remoteUpdatedAt = String(record.updatedAt || "");
+        const localUpdatedAt =
+          localStorage.getItem("bk_back4app_updated_at") || "";
+        if (record.objectId) {
+          nativeSetItem.call(
+            localStorage,
+            "bk_back4app_oid",
+            record.objectId,
+          );
+        }
+        if (remoteUpdatedAt && remoteUpdatedAt === localUpdatedAt) return;
+
+        const savedData = window.__bkNormalizeSavedData
+          ? window.__bkNormalizeSavedData(record.state)
+          : record.state;
+        Object.entries(savedData).forEach(([key, value]) => {
+          if (sessionKeys.has(key)) return;
+          nativeSetItem.call(
+            localStorage,
+            key,
+            typeof value === "string" ? value : JSON.stringify(value),
+          );
+        });
+        if (remoteUpdatedAt) {
+          nativeSetItem.call(
+            localStorage,
+            "bk_back4app_updated_at",
+            remoteUpdatedAt,
+          );
+        }
+        window.location.reload();
+      } catch {
+        // Keep the current admin session usable if a refresh is unavailable.
+      } finally {
+        refreshInFlight = false;
+      }
+    };
+
+    window.addEventListener("focus", refreshAdminData);
+    window.setInterval(refreshAdminData, 30000);
   })();
 </script>
 <script src="https://replit-cdn.com/replit-pill/replit-pill.global.js" data-repl-id="91226334-64dd-42a4-8f21-0e7fb4e916da"></script></body>
